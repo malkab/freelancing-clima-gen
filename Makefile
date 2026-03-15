@@ -1,20 +1,10 @@
+# ----------------------------------
+#
+# Cabecera, no tocar, debe estar aquí.
+#
+# ----------------------------------
 .ONESHELL:
 SHELL := /bin/bash
-
-.PHONY:
-
-# ----------------------------------
-#
-# Ficheros env.
-#
-# ----------------------------------
-# Nombre base de los objetos devcontainer.
-BASE_NAME := freelancing-clima-gen
-
-# Ficheros env en orden de overriding.
-ENV_FILES := ./.devcontainer/assets/env
-
-# Helpers.
 PWD := $(shell pwd)
 INSIDE_CONTAINER := $(shell [ -f /.dockerenv ] && echo true || echo false)
 DATE := $(shell date +%Y%m%d_%H%M%S)
@@ -25,9 +15,41 @@ TEST_ARGS ?=
 
 
 # ----------------------------------
+#
+# Configuración.
+#
+# ----------------------------------
+# Los targets phony son aquellos que no hacen referencia a ningún fichero a
+# compilar.
+.PHONY:
+# Estos ficheros env se aplican en el orden dado y las variables en ellos se van
+# sobreescribiendo.
+ENV_FILES := ./.devcontainer/assets/env ./.devcontainer/assets/env2
+# Nombre base de los objetos devcontainer, para los targets que manipulan los
+# contenedores.
+BASE_NAME := freelancing-clima-gen
 
 
-# Para contenedores.
+# ----------------------------------
+#
+# Targets.
+#
+# ----------------------------------
+# Exec en un contenedor.
+ifeq ($(INSIDE_CONTAINER),false)
+
+docker_exec_python:
+	$(LOAD_ENV)
+
+	docker exec -ti \
+		--workdir /workspace \
+		$(BASE_NAME)-python \
+		/bin/bash
+
+endif
+
+
+# Para los contenedores.
 ifeq ($(INSIDE_CONTAINER),false)
 
 docker_containers_stop:
