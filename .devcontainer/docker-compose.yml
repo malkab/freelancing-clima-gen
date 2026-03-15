@@ -1,0 +1,61 @@
+networks:
+  network:
+    name: freelancing-clima-gen
+
+volumes:
+  postgres-data:
+    name: freelancing-clima-gen-postgres-data
+
+services:
+  # -------------------
+  #
+  # DevContainer Python.
+  #
+  # -------------------
+  python:
+    build:
+      context: .
+      dockerfile: Dockerfile-python
+    image: freelancing-clima-gen-python
+    container_name: freelancing-clima-gen-python
+    command: sleep infinity
+
+    networks:
+      - network
+
+    volumes:
+      - ..:/workspace/
+
+  # -------------------
+  #
+  # PostgreSQL.
+  #
+  # -------------------
+  postgres:
+    build:
+      context: .
+      dockerfile: Dockerfile-postgres
+    image: freelancing-clima-gen-postgres
+    container_name: freelancing-clima-gen-postgres
+    shm_size: "2GB"
+
+    ports:
+      - "5432:5432"
+
+    environment:
+      - POSTGRES_PASSWORD=password
+
+    volumes:
+      - postgres-data:/var/lib/postgresql/
+      - ..:/workspace
+      - ./assets/postgres/postgresql.conf:/etc/postgresql/postgresql.conf
+      - ./assets/postgres/db_setup.sql:/docker-entrypoint-initdb.d/db_setup.sql
+
+    networks:
+      - network
+
+    healthcheck:
+      test: PGPASSWORD="password" psql -U datalake_admin -tAc 'select 1' -d datalake
+      interval: 30s
+      timeout: 10s
+      retries: 20

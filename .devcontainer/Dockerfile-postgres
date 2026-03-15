@@ -1,0 +1,13 @@
+FROM postgis/postgis:18-3.6
+
+LABEL author="Juan Pedro Perez"
+LABEL email="jp.perez.alcantara@pm.me"
+
+RUN localedef -i es_ES -c -f UTF-8 -A /usr/share/locale/locale.alias es_ES.UTF-8
+ENV LANG=es_ES.UTF-8
+
+# Ficheros de inicialización del servidor de base de datos
+# COPY ./assets/postgres/db_setup.sql /docker-entrypoint-initdb.d/
+
+# Utilizar la configuración personalizada de PostgreSQL
+CMD ["-c", "config_file=/etc/postgresql/postgresql.conf"]
