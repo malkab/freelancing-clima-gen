@@ -37,42 +37,72 @@ BASE_NAME := freelancing-clima-gen
 # ----------------------------------
 # Exec en un contenedor.
 ifeq ($(INSIDE_CONTAINER),false)
-
 docker_exec_python:
 	$(LOAD_ENV)
-
 	docker exec -ti \
 		--workdir /workspace \
 		$(BASE_NAME)-python \
 		/bin/bash
+endif
 
+
+# Apaga el Compose.
+ifeq ($(INSIDE_CONTAINER),false)
+docker_compose_down:
+	$(LOAD_ENV)
+	docker compose \
+		-f .devcontainer/docker-compose.yml \
+		-p $(BASE_NAME) \
+		down
 endif
 
 
 # Para los contenedores.
 ifeq ($(INSIDE_CONTAINER),false)
-
 docker_containers_stop:
 	$(LOAD_ENV)
-
-	docker ps --filter name=$(BASE_NAME)* -q | xargs -r docker stop; \
-
+	docker ps --filter name=$(BASE_NAME)* -q | xargs -r docker stop
 endif
 
 
 # Limpia contenedores.
 ifeq ($(INSIDE_CONTAINER),false)
-
 docker_containers_rm:
 	$(LOAD_ENV)
-
 	read -p "¿Eliminar contenedores [s/N]? " confirm
-
-	if [ "$$confirm" = "s" ]; then \
-		docker ps --filter name=$(BASE_NAME)* -q | xargs -r docker stop; \
-		docker ps -a --filter name=$(BASE_NAME)* -q | xargs -r docker rm; \
+	if [ "$$confirm" = "s" ]; then
+		docker ps --filter name=$(BASE_NAME)* -q | xargs -r docker stop
+		docker ps -a --filter name=$(BASE_NAME)* -q | xargs -r docker rm
 	fi
+endif
 
+
+# psql.
+ifeq ($(INSIDE_CONTAINER),false)
+pg_psql:
+	$(LOAD_ENV)
+	docker run -ti --rm \
+		--workdir /workspace \
+		-v $(PWD):/workspace \
+		--network $(BASE_NAME) \
+		--entrypoint psql \
+		-e PGHOST=$$PGHOST \
+		-e PGPORT=$$PGPORT \
+		-e PGUSER=$$PGUSER \
+		-e PGDATABASE=$$PGDATABASE \
+		-e PGPASSWORD=$$PGPASSWORD \
+		freelancing-clima-gen-postgres
+endif
+
+
+# ¡MUCHO CUIDADO! Tira los volúmenes.
+ifeq ($(INSIDE_CONTAINER),false)
+docker_volume_rm:
+	$(LOAD_ENV)
+	read -p "¿Eliminar volúmenes [s/N]? " confirm
+	if [ "$$confirm" = "s" ]; then
+		docker volume ls -q | grep $(BASE_NAME) | xargs -r docker volume rm
+	fi
 endif
 
 
