@@ -1,0 +1,19 @@
+                                                            Tabla «raw.municipios_datos_indice»
+                Columna                |       Tipo       | Ordenamiento | Nulable | Por omisión | Almacenamiento | Compresión | Estadísticas | Descripción 
+---------------------------------------+------------------+--------------+---------+-------------+----------------+------------+--------------+-------------
+ unidad_territorial                    | text             |              |         |             | extended       |            |              | 
+ indice_clima_gen_sin_cambio_climatico | double precision |              |         |             | plain          |            |              | 
+ icc_2040_4_5                          | double precision |              |         |             | plain          |            |              | 
+ icc_2070_4_5                          | double precision |              |         |             | plain          |            |              | 
+ icc_2100_4_5                          | double precision |              |         |             | plain          |            |              | 
+ icc_2040_8_5                          | double precision |              |         |             | plain          |            |              | 
+ icc_2070_8_5                          | double precision |              |         |             | plain          |            |              | 
+ icc_2100_8_5                          | double precision |              |         |             | plain          |            |              | 
+ clima_gen_cambio_climatico_2040_4_5   | double precision |              |         |             | plain          |            |              | 
+ clima_gen_cambio_climatico_2070_4_5   | double precision |              |         |             | plain          |            |              | 
+ clima_gen_cambio_climatico_2100_4_5   | double precision |              |         |             | plain          |            |              | 
+ clima_gen_cambio_climatico_2040_8_5   | double precision |              |         |             | plain          |            |              | 
+ clima_gen_cambio_climatico_2070_8_5   | double precision |              |         |             | plain          |            |              | 
+ clima_gen_cambio_climatico_2100_8_5   | double precision |              |         |             | plain          |            |              | 
+Método de acceso: heap
+

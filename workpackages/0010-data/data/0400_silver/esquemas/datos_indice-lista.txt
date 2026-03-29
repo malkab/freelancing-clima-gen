@@ -1,0 +1,13 @@
+indice_clima_gen_sin_cambio_climatico
+icc_2040_4_5
+icc_2070_4_5
+icc_2100_4_5
+icc_2040_8_5
+icc_2070_8_5
+icc_2100_8_5
+clima_gen_cambio_climatico_2040_4_5
+clima_gen_cambio_climatico_2070_4_5
+clima_gen_cambio_climatico_2100_4_5
+clima_gen_cambio_climatico_2040_8_5
+clima_gen_cambio_climatico_2070_8_5
+clima_gen_cambio_climatico_2100_8_5

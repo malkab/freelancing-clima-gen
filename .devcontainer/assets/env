@@ -3,4 +3,3 @@ PGPORT=5432
 PGUSER=postgres
 PGDATABASE=climagen
 PGPASSWORD=postgres
-PGPASSWORD=postgres

@@ -24,10 +24,11 @@ TEST_ARGS ?=
 .PHONY:
 # Estos ficheros env se aplican en el orden dado y las variables en ellos se van
 # sobreescribiendo.
-ENV_FILES := ./.devcontainer/assets/env ./.devcontainer/assets/env2
+ENV_FILES := ./.devcontainer/assets/env
 # Nombre base de los objetos devcontainer, para los targets que manipulan los
 # contenedores.
 BASE_NAME := freelancing-clima-gen
+PG_DUMP_FILE := climagen.pgdump
 
 
 # ----------------------------------
@@ -102,6 +103,32 @@ docker_volume_rm:
 	read -p "¿Eliminar volúmenes [s/N]? " confirm
 	if [ "$$confirm" = "s" ]; then
 		docker volume ls -q | grep $(BASE_NAME) | xargs -r docker volume rm
+	fi
+endif
+
+
+# PG backup.
+ifeq ($(INSIDE_CONTAINER),false)
+pg_dump:
+	$(LOAD_ENV)
+	read -p "¿Se ha configurado correctamente el backup [s/N]? " confirm
+	if [ "$$confirm" = "s" ]; then
+		docker run -ti --rm \
+			-v $(PWD):/workspace/ \
+			--workdir /workspace/ \
+			--entrypoint pg_dump \
+			--network $(BASE_NAME) \
+			-e PGHOST=$$PGHOST \
+			-e PGPORT=$$PGPORT \
+			-e PGUSER=$$PGUSER \
+			-e PGDATABASE=$$PGDATABASE \
+			-e PGPASSWORD=$$PGPASSWORD \
+			-e PGCLIENTENCODING=UTF8 \
+			-e PGOPTIONS='-c statement_timeout=0 -c idle_in_transaction_session_timeout=0' \
+			freelancing-clima-gen-postgres \
+			-b -F c -v -Z 9 \
+			--no-privileges \
+			-f $(DATE)-$(PG_DUMP_FILE)
 	fi
 endif
 

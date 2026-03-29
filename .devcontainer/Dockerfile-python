@@ -20,7 +20,7 @@ RUN pip install --upgrade pip==25.2
 
 # Instalar dependencias Python de proyecto.
 # COPY assets/data/requirements.txt /
-# RUN pip install --upgrade -r /requirements.txt
+RUN pip install --upgrade -r /requirements.txt
 
 # Instalar la versión de bindings GDAL correcta para Python.
 RUN pip install "GDAL==$(gdal-config --version).*"

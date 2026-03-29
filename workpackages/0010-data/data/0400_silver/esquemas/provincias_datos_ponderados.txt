@@ -1,0 +1,49 @@
+                                                                       Tabla «raw.provincias_datos_ponderados»
+                             Columna                             |       Tipo       | Ordenamiento | Nulable | Por omisión | Almacenamiento | Compresión | Estadísticas | Descripción
+-----------------------------------------------------------------+------------------+--------------+---------+-------------+----------------+------------+--------------+-------------
+ unidad_territorial                                              | text             |              |         |             | extended       |            |              |
+ riesgo_de_incendios                                             | double precision |              |         |             | plain          |            |              |
+ igualdad_jefatura_titular_de_la_explotacion_agricola            | double precision |              |         |             | plain          |            |              |
+ proporcion_poblacion_infantil                                   | double precision |              |         |             | plain          |            |              |
+ igualdad_poblacion_infantil                                     | double precision |              |         |             | plain          |            |              |
+ proporcion_poblacion_65                                         | double precision |              |         |             | plain          |            |              |
+ igualdad_poblacion_65                                           | double precision |              |         |             | plain          |            |              |
+ proporcion_mujeres_sobre_la_poblacion_total                     | double precision |              |         |             | plain          |            |              |
+ dependencia                                                     | double precision |              |         |             | plain          |            |              |
+ discapacidad                                                    | double precision |              |         |             | plain          |            |              |
+ igualdad_discapacidad                                           | double precision |              |         |             | plain          |            |              |
+ igualdad_en_inmigraciones_procedentes_del_extranjero            | double precision |              |         |             | plain          |            |              |
+ igualdad_en_emigraciones_con_destino_al_extranjero              | double precision |              |         |             | plain          |            |              |
+ distribucion_de_la_renta_p80_p20                                | double precision |              |         |             | plain          |            |              |
+ renta_media_neta_por_persona                                    | double precision |              |         |             | plain          |            |              |
+ renta_media_neta_por_hogar                                      | double precision |              |         |             | plain          |            |              |
+ proporcion_menores_18_anyos_en_riesgo_pobreza_extrema           | double precision |              |         |             | plain          |            |              |
+ igualdad_menores_18_anyos_en_riesgo_pobreza_extrema             | double precision |              |         |             | plain          |            |              |
+ proporcion_poblacion_total_en_riesgo_pobreza_extrema            | double precision |              |         |             | plain          |            |              |
+ igualdad_poblacion_en_riesgo_pobreza_extrema                    | double precision |              |         |             | plain          |            |              |
+ proporcion_mayores_65_anyos_en_riesgo_pobreza_extrema           | double precision |              |         |             | plain          |            |              |
+ igualdad_poblacion_mayor_65_anyos_en_riesgo_pobreza_extrema     | double precision |              |         |             | plain          |            |              |
+ igualdad_en_la_formacion_profesional                            | double precision |              |         |             | plain          |            |              |
+ igualdad_25_con_estudios_secundarios_y_superiores               | double precision |              |         |             | plain          |            |              |
+ nivel_educativo                                                 | double precision |              |         |             | plain          |            |              |
+ igualdad_en_nivel_educativo_estudios_primarios                  | double precision |              |         |             | plain          |            |              |
+ igualdad_poblacion_ocupada                                      | double precision |              |         |             | plain          |            |              |
+ proporcion_poblacion_activa                                     | double precision |              |         |             | plain          |            |              |
+ proporcion_desempleo                                            | double precision |              |         |             | plain          |            |              |
+ igualdad_en_desempleo                                           | double precision |              |         |             | plain          |            |              |
+ proporcion_personas_que_viven_solas                             | double precision |              |         |             | plain          |            |              |
+ igualdad_personas_que_viven_solas                               | double precision |              |         |             | plain          |            |              |
+ igualdad_en_el_grado_de_participacion_en_las_tareas_domesticas  | double precision |              |         |             | plain          |            |              |
+ igualdad_en_cuidados_a_menores_o_personas_dependientes_dentro_d | double precision |              |         |             | plain          |            |              |
+ proporcion_personas_sin_apoyo_social                            | double precision |              |         |             | plain          |            |              |
+ igualdad_personas_sin_apoyo_social                              | double precision |              |         |             | plain          |            |              |
+ proporcion_personas_en_establecimientos_colectivos_residenciale | double precision |              |         |             | plain          |            |              |
+ igualdad_personas_en_establecimientos_colectivos_residenciales_ | double precision |              |         |             | plain          |            |              |
+ dispositivos_de_atencion_primaria                               | double precision |              |         |             | plain          |            |              |
+ delitos_por_acoso_sexual                                        | double precision |              |         |             | plain          |            |              |
+ proporcion_acceso_a_smartphone                                  | double precision |              |         |             | plain          |            |              |
+ igualdad_en_el_acceso_a_smartphone                              | double precision |              |         |             | plain          |            |              |
+ igualdad_en_el_acceso_a_internet                                | double precision |              |         |             | plain          |            |              |
+ anyo_construccion_vivienda                                      | double precision |              |         |             | plain          |            |              |
+ personas_convivientes_y_superficie_vivienda                     | double precision |              |         |             | plain          |            |              |
+Método de acceso: heap

@@ -18,6 +18,8 @@ services:
       dockerfile: Dockerfile-python
     image: freelancing-clima-gen-python
     container_name: freelancing-clima-gen-python
+    env_file:
+      - assets/env
     command: sleep infinity
 
     networks:

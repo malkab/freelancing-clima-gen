@@ -8,4 +8,12 @@
 
 -- Creación de la base de datos
 
-CREATE DATABASE climagen;
+create database climagen;
+
+\c climagen
+
+create extension postgis;
+
+create schema raw;
+
+create schema climagen;
