@@ -114,6 +114,19 @@ def make_pg_conn_sqlalchemy(
     )
 
 
+def quote_pg_identifier(identifier: str) -> str:
+    """Safely quotes a PostgreSQL identifier.
+
+    Args:
+        identifier (str): The identifier to quote.
+
+    Returns:
+        str: The quoted identifier, with internal double quotes escaped.
+
+    """
+    return '"' + identifier.replace('"', '""') + '"'
+
+
 def import_excel_range_to_pg(
     excel_path: str,
     sheet_name: str,
@@ -123,12 +136,24 @@ def import_excel_range_to_pg(
     excel_range: str | None = None,
     if_exists: str = "replace",   # fail | replace | append
     chunksize: int = 1000,
+    comment: str | None = None,
 ) -> None:
     """
     Import an Excel sheet or a rectangular range into PostgreSQL.
 
     Example range:
         B3:H200
+
+    Args:
+        excel_path (str): Path to the Excel file.
+        sheet_name (str): Excel sheet name.
+        schema (str): Destination PostgreSQL schema.
+        table_name (str): Destination PostgreSQL table name.
+        pg_conn_sqlalchemy (str): SQLAlchemy PostgreSQL connection string.
+        excel_range (str | None): Optional Excel rectangular range, e.g. 'B3:H200'.
+        if_exists (str): What to do if the table already exists: 'fail', 'replace', or 'append'.
+        chunksize (int): Number of rows per batch during insert.
+        comment (str | None): Optional PostgreSQL table comment. If None, no comment is applied.
     """
     read_kwargs: dict = {
         "io": Path(excel_path),
@@ -170,6 +195,15 @@ def import_excel_range_to_pg(
             method="multi",
         )
 
+        if comment is not None:
+            qualified_table = (
+                f"{quote_pg_identifier(schema)}.{quote_pg_identifier(table_name)}"
+            )
+            conn.exec_driver_sql(
+                f"COMMENT ON TABLE {qualified_table} IS %s",
+                (comment,)
+            )
+
 
 # ---
 
@@ -181,64 +215,73 @@ pg_conn = make_pg_conn_sqlalchemy(
     dbname="climagen",
 )
 
+source_data_path = Path("../data/0400_silver/")
+
 # Regional
 
 import_excel_range_to_pg(
-    excel_path="../data/0100_in/datos_proyecto/Datos Regional DEF.xlsx",
+    excel_path=source_data_path / "Datos Regional DEF.xlsx",
     sheet_name="Datos ponderados",
     schema="raw",
     table_name="autonomias_datos_ponderados",
     pg_conn_sqlalchemy=pg_conn,
     excel_range="A1:BE20",
+    comment="Datos ponderados por autonomía, con todas las variables y años disponibles en el Excel original. Cada fila corresponde a una autonomía distinta (Bronce)."
 )
 
 import_excel_range_to_pg(
-    excel_path="../data/0100_in/datos_proyecto/Datos Regional DEF.xlsx",
+    excel_path=source_data_path / "Datos Regional DEF.xlsx",
     sheet_name="Índice Clima-Gen + CC",
     schema="raw",
     table_name="autonomias_datos_indice",
     pg_conn_sqlalchemy=pg_conn,
     excel_range="A2:N21",
+    comment="Índice Clima-Gen + CC por autonomía, con las variables necesarias para su cálculo. Cada fila corresponde a una autonomía distinta (Bronce)."
 )
 
 
 # Provincial
 
 import_excel_range_to_pg(
-    excel_path="../data/0100_in/datos_proyecto/Datos Provincial DEF.xlsx",
+    excel_path=source_data_path / "Datos Provincial DEF.xlsx",
     sheet_name="Datos ponderados",
     schema="raw",
     table_name="provincias_datos_ponderados",
     pg_conn_sqlalchemy=pg_conn,
     excel_range="A1:AS53",
+    comment="Datos ponderados por provincia, con todas las variables y años disponibles en el Excel original. Cada fila corresponde a una provincia distinta (Bronce)."
 )
 
+
 import_excel_range_to_pg(
-    excel_path="../data/0100_in/datos_proyecto/Datos Provincial DEF.xlsx",
+    excel_path=source_data_path / "Datos Provincial DEF.xlsx",
     sheet_name="Índice Clima-Gen + CC",
     schema="raw",
     table_name="provincias_datos_indice",
     pg_conn_sqlalchemy=pg_conn,
     excel_range="A2:N54",
+    comment="Índice Clima-Gen + CC por provincia, con las variables necesarias para su cálculo. Cada fila corresponde a una provincia distinta (Bronce)."
 )
 
 
 # Municipio
 
 import_excel_range_to_pg(
-    excel_path="../data/0100_in/datos_proyecto/Datos Municipal DEF.xlsx",
+    excel_path=source_data_path / "Datos Municipal DEF.xlsx",
     sheet_name="Datos ponderados",
     schema="raw",
     table_name="municipios_datos_ponderados",
     pg_conn_sqlalchemy=pg_conn,
     excel_range="A1:AM8133",
+    comment="Datos ponderados por municipio, con todas las variables y años disponibles en el Excel original. Cada fila corresponde a un municipio distinto (Bronce)."
 )
 
 import_excel_range_to_pg(
-    excel_path="../data/0100_in/datos_proyecto/Datos Municipal DEF.xlsx",
+    excel_path=source_data_path / "Datos Municipal DEF.xlsx",
     sheet_name="Índice Clima-Gen + CC",
     schema="raw",
     table_name="municipios_datos_indice",
     pg_conn_sqlalchemy=pg_conn,
     excel_range="A2:N8134",
+    comment="Índice Clima-Gen + CC por municipio, con las variables necesarias para su cálculo. Cada fila corresponde a un municipio distinto (Bronce)."
 )

@@ -3,5 +3,6 @@
   <component name="DataSourcePerFileMappings">
     <file url="file://$PROJECT_DIR$/workpackages/0010-data/src/0020-etl.sql" value="54df928a-a773-4ff9-b0c0-aa3d1fa52d17" />
     <file url="file://$PROJECT_DIR$/workpackages/0010-data/src/0030-variables-ddl.sql" value="54df928a-a773-4ff9-b0c0-aa3d1fa52d17" />
+    <file url="file://$PROJECT_DIR$/workpackages/0010-data/src/0040-etl_variables.sql" value="54df928a-a773-4ff9-b0c0-aa3d1fa52d17" />
   </component>
 </project>

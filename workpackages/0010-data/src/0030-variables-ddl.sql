@@ -89,6 +89,10 @@ select
 from
     raw.variables_datos_indice;
 
+comment on table climagen.variable
+is 'Catálogo de variables (Gold, estructura reproducible, datos editados).';
+
+
 commit;
 
 vacuum analyze climagen.variable;
