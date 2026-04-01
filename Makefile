@@ -33,6 +33,21 @@ PG_DUMP_FILE := climagen.pgdump
 
 # ----------------------------------
 #
+# Funciones auxiliares.
+#
+# ----------------------------------
+# Carga de variables de entorno
+define LOAD_ENV
+@set -a
+@for f in $(ENV_FILES); do
+  [ -f $$f ] && . $$f
+@done
+@set +a
+endef
+
+
+# ----------------------------------
+#
 # Targets.
 #
 # ----------------------------------
@@ -44,6 +59,17 @@ docker_exec_python:
 		--workdir /workspace \
 		$(BASE_NAME)-python \
 		/bin/bash
+endif
+
+
+# Arranca el Compose.
+ifeq ($(INSIDE_CONTAINER),false)
+docker_compose_up:
+	$(LOAD_ENV)
+	docker compose \
+		-f .devcontainer/docker-compose.yml \
+		-p $(BASE_NAME) \
+		up -d
 endif
 
 
@@ -133,16 +159,28 @@ pg_dump:
 endif
 
 
-# ----------------------------------
-#
-# Funciones auxiliares.
-#
-# ----------------------------------
-# Carga de variables de entorno
-define LOAD_ENV
-@set -a
-@for f in $(ENV_FILES); do
-  [ -f $$f ] && . $$f
-@done
-@set +a
-endef
+# Borra todo rastro del Compose salvo los volúmenes, aunque
+# borrar los volúmenes huérfanos.
+ifeq ($(INSIDE_CONTAINER),false)
+docker_compose_rm:
+	$(LOAD_ENV)
+	read -p "¿Eliminar infraestructura Docker (salvo volúmenes) [s/N]? " confirm
+	if [ "$$confirm" = "s" ]; then
+		docker ps --filter name=$(BASE_NAME)* -q | xargs -r docker stop -t0
+		docker ps -a --filter name=$(BASE_NAME)* -q | xargs -r docker rm
+		docker image ls --filter reference=$(BASE_NAME)* -q | xargs -r docker image rm
+		docker network ls --filter name=$(BASE_NAME) -q | xargs -r docker network rm
+		docker volume prune -f
+	fi
+endif
+
+
+# OpenCode.
+ifeq ($(INSIDE_CONTAINER),false)
+opencode:
+	$(LOAD_ENV)
+	docker exec -ti \
+		--workdir /workspace \
+		$(BASE_NAME)-python \
+		/bin/bash -c "/home/vscode/.opencode/bin/opencode"
+endif

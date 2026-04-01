@@ -1,4 +1,8 @@
-pandas==2.2.3
+fastapi>=0.115.0,<1.0.0
 openpyxl==3.1.5
+pandas==2.2.3
+psycopg-binary==3.2.5
+psycopg-pool==3.2.6
+psycopg==3.2.5
 SQLAlchemy==2.0.48
-psycopg2-binary==2.9.11
+uvicorn[standard]>=0.30.0,<1.0.0
