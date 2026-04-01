@@ -15,12 +15,12 @@ DB_USER = os.getenv("DB_USER", "postgres")
 DB_PASSWORD = os.getenv("DB_PASSWORD", "postgres")
 
 
-@app.get("/v1/health")
+@app.get("/api/v1/health")
 def health() -> dict[str, str]:
     return {"status": "ok"}
 
 
-@app.get("/v1/table/{table_name}")
+@app.get("/api/v1/table/{table_name}")
 def get_table_rows(table_name: str) -> dict[str, object]:
     print("D: 000", table_name)
 

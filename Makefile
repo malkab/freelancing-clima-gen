@@ -168,7 +168,7 @@ docker_compose_rm:
 	if [ "$$confirm" = "s" ]; then
 		docker ps --filter name=$(BASE_NAME)* -q | xargs -r docker stop -t0
 		docker ps -a --filter name=$(BASE_NAME)* -q | xargs -r docker rm
-		docker image ls --filter reference=$(BASE_NAME)* -q | xargs -r docker image rm
+		docker image ls --filter reference=*$(BASE_NAME)* -q | xargs -r docker image rm
 		docker network ls --filter name=$(BASE_NAME) -q | xargs -r docker network rm
 		docker volume prune -f
 	fi
@@ -183,4 +183,13 @@ opencode:
 		--workdir /workspace \
 		$(BASE_NAME)-python \
 		/bin/bash -c "/home/vscode/.opencode/bin/opencode"
+endif
+
+
+# Logs de la API Python.
+ifeq ($(INSIDE_CONTAINER),false)
+docker_logs_python:
+	$(LOAD_ENV)
+	docker logs -f \
+		$(BASE_NAME)-python
 endif
