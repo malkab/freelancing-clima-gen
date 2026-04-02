@@ -209,3 +209,15 @@ docker_restart_nginx:
 	$(LOAD_ENV)
 	docker restart $(BASE_NAME)-nginx
 endif
+
+
+# Ejecución del servidor de desarrollo.
+ifeq ($(INSIDE_CONTAINER),false)
+docker_node_run_dev:
+	$(LOAD_ENV)
+	docker exec -ti \
+		--workdir /workspace/frontend \
+		--user node \
+		$(BASE_NAME)-node \
+		npm run dev
+endif
