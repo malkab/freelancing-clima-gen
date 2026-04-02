@@ -27,8 +27,6 @@ RUN pip install "GDAL==$(gdal-config --version).*"
 
 USER vscode
 
-RUN curl -fsSL https://opencode.ai/install | bash
-
 WORKDIR /workspace/api
 EXPOSE 8000
 

@@ -51,13 +51,25 @@ endef
 # Targets.
 #
 # ----------------------------------
-# Exec en un contenedor.
+# Exec en Python.
 ifeq ($(INSIDE_CONTAINER),false)
 docker_exec_python:
 	$(LOAD_ENV)
 	docker exec -ti \
 		--workdir /workspace \
 		$(BASE_NAME)-python \
+		/bin/bash
+endif
+
+
+# Exec en Node.
+ifeq ($(INSIDE_CONTAINER),false)
+docker_exec_node:
+	$(LOAD_ENV)
+	docker exec -ti \
+		--user node \
+		--workdir /workspace \
+		$(BASE_NAME)-node \
 		/bin/bash
 endif
 
@@ -175,21 +187,25 @@ docker_compose_rm:
 endif
 
 
-# OpenCode.
-ifeq ($(INSIDE_CONTAINER),false)
-opencode:
-	$(LOAD_ENV)
-	docker exec -ti \
-		--workdir /workspace \
-		$(BASE_NAME)-python \
-		/bin/bash -c "/home/vscode/.opencode/bin/opencode"
-endif
-
-
 # Logs de la API Python.
 ifeq ($(INSIDE_CONTAINER),false)
 docker_logs_python:
 	$(LOAD_ENV)
-	docker logs -f \
-		$(BASE_NAME)-python
+	docker logs -f $(BASE_NAME)-python
+endif
+
+
+# Logs de NGINX.
+ifeq ($(INSIDE_CONTAINER),false)
+docker_logs_nginx:
+	$(LOAD_ENV)
+	docker logs -f $(BASE_NAME)-nginx
+endif
+
+
+# Reiniciar el NGINX.
+ifeq ($(INSIDE_CONTAINER),false)
+docker_restart_nginx:
+	$(LOAD_ENV)
+	docker restart $(BASE_NAME)-nginx
 endif

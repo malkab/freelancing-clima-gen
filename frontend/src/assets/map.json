@@ -1,0 +1,39 @@
+{
+    "version": 8,
+    "name": "OpenStreetMap Raster Base",
+    "metadata": {},
+    "sources": {
+        "openstreetmap": {
+            "type": "raster",
+            "tiles": [
+                "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+            ],
+            "tileSize": 256,
+            "minzoom": 0,
+            "maxzoom": 22,
+            "attribution": "© OpenStreetMap contributors"
+        }
+    },
+
+    "layers": [
+        {
+            "id": "openstreetmap",
+            "type": "raster",
+            "source": "openstreetmap",
+            "metadata": {
+                "group": "base",
+                "name": "OpenStreetMap"
+            },
+            "paint": {
+                "raster-opacity": 1.0,
+                "raster-opacity-transition": {
+                    "duration": 3000,
+                    "delay": 0
+                }
+            },
+            "layout": {
+                "visibility": "visible"
+            }
+        }
+    ]
+}

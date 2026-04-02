@@ -1,0 +1,54 @@
+:root {
+  --bar-height: 64px;
+  --bar-bg: #0f172a;
+  --bar-text: #f8fafc;
+  --map-bg: #1d4ed8;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.app-shell {
+  min-height: 100dvh;
+  display: grid;
+  grid-template-rows: var(--bar-height) 1fr var(--bar-height);
+}
+
+.bar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: red; /* var(--bar-bg) */
+  color: var(--bar-text);
+}
+
+.bar h1,
+.bar p {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.map-area {
+  min-height: 0;
+  background: var(--map-bg);
+}
+
+#map {
+  width: 100%;
+  height: 100%;
+  background: var(--map-bg);
+}

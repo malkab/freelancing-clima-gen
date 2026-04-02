@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MapLibre Layout</title>
+    <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" />
+    <link rel="stylesheet" href="./src/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="bar bar-header">
+        <h1>Header</h1>
+      </header>
+
+      <main class="map-area">
+        <div id="map" aria-label="Map view"></div>
+      </main>
+
+      <footer class="bar bar-footer">
+        <p>Footer</p>
+      </footer>
+    </div>
+
+    <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+    <script type="module" src="./src/script.js"></script>
+  </body>
+</html>
