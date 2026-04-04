@@ -5,6 +5,8 @@
 
 */
 
+rollback;
+
 begin;
 
 -- Esquema de trabajo
@@ -326,7 +328,9 @@ select
     round(clima_gen_cambio_climatico_2100_8_5::numeric, 1) as clima_gen_cambio_climatico_2100_8_5,
 
     -- Geometría
-    geom
+    geom,
+    st_pointonsurface(geom) as geom_centroid,
+    st_boundary(geom) as geom_borde
 from
     temp_etl.autonomia_geom a left join
     temp_etl.autonomia_datos_ponderados b on
@@ -335,19 +339,36 @@ from
         a.unidad_territorial_id = c.unidad_territorial_id
 order by a.unidad_territorial_id;
 
+alter table climagen.autonomia
+add constraint pk_autonomia_gid
+primary key (unidad_territorial_id);
+
 create index idx_autonomia_geom_gist
 on climagen.autonomia
 using gist(geom);
 
+create index idx_autonomia_geom_centroid_gist
+on climagen.autonomia
+using gist(geom_centroid);
+
+create index idx_autonomia_geom_borde_gist
+on climagen.autonomia
+using gist(geom_borde);
+
 alter table climagen.autonomia
 alter column geom
 type geometry(MultiPolygon, 3857)
 using st_setsrid(geom, 3857);
 
 alter table climagen.autonomia
-alter column geom
-type geometry(MultiPolygon, 3857)
-using st_setsrid(geom, 3857);
+alter column geom_centroid
+type geometry(Point, 3857)
+using st_setsrid(geom_centroid, 3857);
+
+alter table climagen.autonomia
+alter column geom_borde
+type geometry(MultiLinestring, 3857)
+using st_setsrid(geom_borde, 3857);
 
 
 drop table if exists climagen.provincia;
@@ -428,7 +449,9 @@ select
     round(clima_gen_cambio_climatico_2100_8_5::numeric, 1) as clima_gen_cambio_climatico_2100_8_5,
 
     -- Geometría
-    geom
+    geom,
+    st_pointonsurface(geom) as geom_centroid,
+    st_boundary(geom) as geom_borde
 from
     temp_etl.provincia_geom a left join
     temp_etl.provincia_datos_ponderados b on
@@ -445,10 +468,28 @@ create index idx_provincia_geom_gist
 on climagen.provincia
 using gist(geom);
 
+create index idx_provincia_geom_centroid_gist
+on climagen.provincia
+using gist(geom_centroid);
+
+create index idx_provincia_geom_borde_gist
+on climagen.provincia
+using gist(geom_borde);
+
 alter table climagen.provincia
 alter column geom
 type geometry(MultiPolygon, 3857)
 using st_setsrid(geom, 3857);
+
+alter table climagen.provincia
+alter column geom_centroid
+type geometry(Point, 3857)
+using st_setsrid(geom_centroid, 3857);
+
+alter table climagen.provincia
+alter column geom_borde
+type geometry(MultiLinestring, 3857)
+using st_setsrid(geom_borde, 3857);
 
 
 drop table if exists climagen.municipio;
@@ -523,7 +564,9 @@ select
     round(clima_gen_cambio_climatico_2100_8_5::numeric, 1) as clima_gen_cambio_climatico_2100_8_5,
 
     -- Geometría
-    geom
+    geom,
+    st_pointonsurface(geom) as geom_centroid,
+    st_boundary(geom) as geom_borde
 from
     temp_etl.municipio_geom a left join
     temp_etl.municipio_datos_ponderados b on
@@ -540,10 +583,28 @@ create index idx_municipio_geom_gist
 on climagen.municipio
 using gist(geom);
 
+create index idx_municipio_geom_centroid_gist
+on climagen.municipio
+using gist(geom_centroid);
+
+create index idx_municipio_geom_borde_gist
+on climagen.municipio
+using gist(geom_borde);
+
 alter table climagen.municipio
 alter column geom
 type geometry(MultiPolygon, 3857)
 using st_setsrid(geom, 3857);
+
+alter table climagen.municipio
+alter column geom_centroid
+type geometry(Point, 3857)
+using st_setsrid(geom_centroid, 3857);
+
+alter table climagen.municipio
+alter column geom_borde
+type geometry(MultiLinestring, 3857)
+using st_setsrid(geom_borde, 3857);
 
 
 -- Drop etl schema

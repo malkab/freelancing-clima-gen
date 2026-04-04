@@ -1,54 +1,184 @@
 :root {
-  --bar-height: 64px;
-  --bar-bg: #0f172a;
-  --bar-text: #f8fafc;
-  --map-bg: #1d4ed8;
+    --footer-logo-height: 60px;
+    --footer-padding-y: 10px;
+    --footer-padding-x: 20px;
+    --footer-logo-gap: 30px;
+    --footer-section-gap: 20px;
+    --footer-height: calc(var(--footer-logo-height) + (var(--footer-padding-y) * 2));
+    --bar-bg: white;
+    --bar-text: black;
+    --map-bg: white;
+    --floating-logo-height: 230px;
+    --magenta: #c4017b;
+    --blue: #009de0;
 }
 
 * {
-  box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 html,
 body {
-  height: 100%;
-  margin: 0;
+    height: 100%;
+    margin: 0;
 }
 
 body {
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .app-shell {
-  min-height: 100dvh;
-  display: grid;
-  grid-template-rows: var(--bar-height) 1fr var(--bar-height);
+    min-height: 100dvh;
+    display: grid;
+    grid-template-rows: 1fr var(--footer-height);
 }
 
 .bar {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: red; /* var(--bar-bg) */
-  color: var(--bar-text);
+    width: 100%;
+    display: flex;
+    align-items: center;
+    background: var(--bar-bg);
+    color: var(--bar-text);
 }
 
-.bar h1,
-.bar p {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
+.bar-footer {
+    justify-content: space-between;
+    padding: var(--footer-padding-y) var(--footer-padding-x);
+    gap: var(--footer-section-gap);
+}
+
+.footer-legal {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-right: auto;
+}
+
+.footer-legal-title,
+.footer-legal-line {
+    margin: 0;
+}
+
+.footer-legal-title {
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.footer-legal-line {
+    font-size: 0.72rem;
+    line-height: 1.2;
+}
+
+.footer-logos {
+    display: flex;
+    align-items: center;
+    gap: var(--footer-logo-gap);
+}
+
+.footer-logo {
+    height: var(--footer-logo-height);
+    width: auto;
+    display: block;
 }
 
 .map-area {
-  min-height: 0;
-  background: var(--map-bg);
+    min-height: 0;
+    background: var(--map-bg);
+    position: relative;
 }
 
 #map {
-  width: 100%;
-  height: 100%;
-  background: var(--map-bg);
+    width: 100%;
+    height: 100%;
+    background: var(--map-bg);
+}
+
+#clima-gen-logo {
+    height: var(--floating-logo-height);
+    width: auto;
+    display: block;
+}
+
+.clima-gen-logo-overlay {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    z-index: 5;
+    pointer-events: none;
+}
+
+.map-hover-info {
+    position: absolute;
+    left: 16px;
+    bottom: 16px;
+    z-index: 6;
+    pointer-events: none;
+    padding: 6px 10px;
+    border-radius: 6px;
+    background: rgba(17, 24, 39, 0.78);
+    color: #ffffff;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 0.8rem;
+    line-height: 1.2;
+    white-space: pre-wrap;
+    max-width: min(560px, calc(100vw - 32px));
+    max-height: 45dvh;
+    overflow: auto;
+}
+
+.map-legend {
+    position: absolute;
+    right: 14px;
+    bottom: 42px;
+    z-index: 6;
+    min-width: 260px;
+    max-width: min(420px, calc(100vw - 32px));
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.92);
+    color: #111827;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.22);
+}
+
+.map-legend-title {
+    margin: 0 0 8px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+}
+
+.map-legend-bar {
+    width: 100%;
+    height: 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(17, 24, 39, 0.3);
+}
+
+.map-legend-scale {
+    position: relative;
+    height: 20px;
+    margin-top: 7px;
+}
+
+.map-legend-tick {
+    position: absolute;
+    top: 0;
+    transform: translateX(-50%);
+    font-size: 0.72rem;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+#logo_universidad_vigo {
+    height: calc(var(--footer-logo-height) * 0.7);
+}
+
+#logo_instituto_mujer {
+    height: calc(var(--footer-logo-height) * 0.7);
+}
+
+#logo_upo {
+    height: calc(var(--footer-logo-height) * 0.8);
 }

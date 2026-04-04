@@ -1,28 +1,51 @@
 <!doctype html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MapLibre Layout</title>
-    <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" />
+    <link rel="stylesheet" href="./src/lib/maplibre-gl.css" />
     <link rel="stylesheet" href="./src/styles.css" />
-  </head>
-  <body>
+    <script src="./src/lib/maplibre-gl.js"></script>
+</head>
+
+<body>
     <div class="app-shell">
-      <header class="bar bar-header">
-        <h1>Header</h1>
-      </header>
+        <main class="map-area">
 
-      <main class="map-area">
-        <div id="map" aria-label="Map view"></div>
-      </main>
+            <div id="map" aria-label="Map view"></div>
 
-      <footer class="bar bar-footer">
-        <p>Footer</p>
-      </footer>
+            <div id="map-hover-info" class="map-hover-info" aria-live="polite">Move cursor over map</div>
+
+            <div id="map-legend" class="map-legend" aria-label="Autonomia legend"></div>
+
+            <div class="clima-gen-logo-overlay" aria-hidden="true">
+                <img id="clima-gen-logo" src="src/assets/images/logo_clima_gen.webp" alt="Logo Clima-Gen" />
+            </div>
+        </main>
+
+        <footer class="bar bar-footer">
+            <div class="footer-legal" aria-label="Legal notice">
+                <p class="footer-legal-title">Lorem Ipsum</p>
+                <p class="footer-legal-line">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                <p class="footer-legal-line">Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</p>
+            </div>
+
+            <div class="footer-logos" aria-label="Partner logos">
+                <img class="footer-logo" id="logo_instituto_mujer" src="src/assets/images/logo_instituto_mujer.webp"
+                    alt="Logo Instituto de la Mujer" />
+                <img class="footer-logo" id="logo_upo" src="src/assets/images/logo_upo.webp"
+                    alt="Logo Universidad Pablo de Olavide" />
+                <img class="footer-logo" id="logo_universidad_barcelona"
+                    src="src/assets/images/logo_universidad_barcelona.webp" alt="Logo Universidad de Barcelona" />
+                <img id="logo_universidad_vigo" class="footer-logo" src="src/assets/images/logo_uvigo.webp"
+                    alt="Logo Universidad de Vigo" />
+            </div>
+        </footer>
     </div>
 
-    <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
-    <script type="module" src="./src/script.js"></script>
-  </body>
+    <script type="module" src="./src/main.js"></script>
+</body>
+
 </html>

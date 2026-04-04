@@ -2,7 +2,12 @@
     "version": 8,
     "name": "OpenStreetMap Raster Base",
     "metadata": {},
+    "glyphs": "https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf",
     "sources": {
+        "maplibre": {
+            "url": "https://demotiles.maplibre.org/tiles/tiles.json",
+            "type": "vector"
+        },
         "openstreetmap": {
             "type": "raster",
             "tiles": [
@@ -12,10 +17,100 @@
             "minzoom": 0,
             "maxzoom": 22,
             "attribution": "© OpenStreetMap contributors"
+        },
+
+        "autonomia_area": {
+            "type": "vector",
+            "tiles": [
+                "http://localhost:5173/martin/autonomia/{z}/{x}/{y}"
+            ],
+            "minzoom": 0,
+            "maxzoom": 22
+        },
+        "autonomia_borde": {
+            "type": "vector",
+            "tiles": [
+                "http://localhost:5173/martin/autonomia.1/{z}/{x}/{y}"
+            ],
+            "minzoom": 0,
+            "maxzoom": 22
+        },
+        "autonomia_centroid": {
+            "type": "vector",
+            "tiles": [
+                "http://localhost:5173/martin/autonomia.2/{z}/{x}/{y}"
+            ],
+            "minzoom": 0,
+            "maxzoom": 22
+        },
+
+        "provincia_area": {
+            "type": "vector",
+            "tiles": [
+                "http://localhost:5173/martin/provincia/{z}/{x}/{y}"
+            ],
+            "minzoom": 0,
+            "maxzoom": 22
+        },
+        "provincia_borde": {
+            "type": "vector",
+            "tiles": [
+                "http://localhost:5173/martin/provincia.1/{z}/{x}/{y}"
+            ],
+            "minzoom": 0,
+            "maxzoom": 22
+        },
+        "provincia_centroid": {
+            "type": "vector",
+            "tiles": [
+                "http://localhost:5173/martin/provincia.2/{z}/{x}/{y}"
+            ],
+            "minzoom": 0,
+            "maxzoom": 22
+        },
+
+        "municipio_area": {
+            "type": "vector",
+            "tiles": [
+                "http://localhost:5173/martin/municipio/{z}/{x}/{y}"
+            ],
+            "minzoom": 0,
+            "maxzoom": 22
+        },
+        "municipio_borde": {
+            "type": "vector",
+            "tiles": [
+                "http://localhost:5173/martin/municipio.1/{z}/{x}/{y}"
+            ],
+            "minzoom": 0,
+            "maxzoom": 22
+        },
+        "municipio_centroid": {
+            "type": "vector",
+            "tiles": [
+                "http://localhost:5173/martin/municipio.2/{z}/{x}/{y}"
+            ],
+            "minzoom": 0,
+            "maxzoom": 22
         }
     },
 
     "layers": [
+        {
+            "id": "background",
+            "type": "background",
+            "paint": {
+                "background-color": "#ffffff"
+            },
+            "filter": [
+                "all"
+            ],
+            "layout": {
+                "visibility": "visible"
+            },
+            "maxzoom": 24
+        },
+
         {
             "id": "openstreetmap",
             "type": "raster",
@@ -24,15 +119,88 @@
                 "group": "base",
                 "name": "OpenStreetMap"
             },
+            "layout": {
+                "visibility": "visible"
+            }
+        },
+
+        {
+            "id": "variable_area",
+            "type": "fill",
+            "source": "autonomia_area",
+            "source-layer": "autonomia",
             "paint": {
-                "raster-opacity": 1.0,
-                "raster-opacity-transition": {
-                    "duration": 3000,
-                    "delay": 0
-                }
+                "fill-outline-color": "#00000000",
+                "fill-color": [
+                    "interpolate",
+                    ["linear"],
+                    ["to-number", ["get", "indice_clima_gen_sin_cambio_climatico"]],
+                    34,  "#ffffb2",
+                    40,  "#fecc5c",
+                    70,  "#fd8d3c",
+                    90,  "#f03b20",
+                    128, "#bd0026"
+                ],
+                "fill-opacity": 0.3
             },
             "layout": {
                 "visibility": "visible"
+            }
+        },
+        {
+            "id": "variable_borde",
+            "type": "line",
+            "source": "autonomia_borde",
+            "source-layer": "autonomia.1",
+            "filter": [
+                "all",
+                ["has", "indice_clima_gen_sin_cambio_climatico"],
+                ["!=", ["get", "indice_clima_gen_sin_cambio_climatico"], null]
+            ],
+            "paint": {
+                "line-color": "#222222cc",
+                "line-width": 0.25,
+                "line-opacity": 0.5
+            },
+            "layout": {
+                "visibility": "visible"
+            }
+        },
+        {
+            "id": "variable_centroid",
+            "type": "circle",
+            "source": "autonomia_centroid",
+            "source-layer": "autonomia.2",
+            "filter": [
+                "all",
+                ["has", "indice_clima_gen_sin_cambio_climatico"],
+                ["!=", ["get", "indice_clima_gen_sin_cambio_climatico"], null]
+            ],
+            "paint": {
+                "circle-color": [
+                    "interpolate",
+                    ["linear"],
+                    ["to-number", ["get", "indice_clima_gen_sin_cambio_climatico"]],
+                    34,  "#ffffb2",
+                    40,  "#fecc5c",
+                    70,  "#fd8d3c",
+                    90,  "#f03b20",
+                    128, "#bd0026"
+                ],
+                "circle-radius": [
+                    "interpolate",
+                    ["linear"],
+                    ["to-number", ["get", "indice_clima_gen_sin_cambio_climatico"]],
+                    34,  4,
+                    128, 20
+                ],
+                "circle-opacity": 1,
+                "circle-stroke-color": "#000000cc",
+                "circle-stroke-width": 0.25
+            },
+            "layout": {
+                "visibility": "visible",
+                "circle-sort-key": ["to-number", ["get", "indice_clima_gen_sin_cambio_climatico"]]
             }
         }
     ]
