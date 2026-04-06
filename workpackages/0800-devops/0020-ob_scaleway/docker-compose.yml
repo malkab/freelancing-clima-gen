@@ -1,0 +1,124 @@
+networks:
+  network:
+    name: freelancing-clima-gen
+
+volumes:
+  postgres-data:
+    name: freelancing-clima-gen-postgres-data
+
+services:
+  # # -------------------
+  # #
+  # # DevContainer Python.
+  # #
+  # # -------------------
+  # python:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile-python
+  #   image: freelancing-clima-gen-python
+  #   container_name: freelancing-clima-gen-python
+  #   env_file:
+  #     - assets/env
+
+  #   ports:
+  #     - "8000:8000"
+
+  #   networks:
+  #     - network
+
+  #   depends_on:
+  #     - postgres
+
+  #   volumes:
+  #     - ..:/workspace/
+
+  # # -------------------
+  # #
+  # # PostgreSQL.
+  # #
+  # # -------------------
+  # postgres:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile-postgres
+  #   image: freelancing-clima-gen-postgres
+  #   container_name: freelancing-clima-gen-postgres
+  #   shm_size: "2GB"
+
+  #   ports:
+  #     - "5432:5432"
+
+  #   environment:
+  #     - POSTGRES_PASSWORD=postgres
+
+  #   volumes:
+  #     - postgres-data:/var/lib/postgresql/
+  #     - ..:/workspace
+  #     - ./assets/postgres/postgresql.conf:/etc/postgresql/postgresql.conf
+  #     - ./assets/postgres/db_setup.sql:/docker-entrypoint-initdb.d/db_setup.sql
+
+  #   networks:
+  #     - network
+
+  #   healthcheck:
+  #     test: PGPASSWORD="postgres" psql -U postgres -tAc 'select 1' -d postgres
+  #     interval: 60s
+  #     timeout: 10s
+  #     retries: 20
+
+  # # -------------------
+  # #
+  # # MapLibre Martin.
+  # #
+  # # -------------------
+  # martin:
+  #   image: ghcr.io/maplibre/martin:v0.16.0
+  #   container_name: freelancing-clima-gen-martin
+  #   restart: unless-stopped
+  #   command: ["--config", "/config.yaml"]
+  #   env_file: ./assets/env
+
+  #   ports:
+  #     - "3500:3000"
+
+  #   networks:
+  #     - network
+
+  #   volumes:
+  #     - ./assets/martin/config.yaml:/config.yaml
+
+  #   healthcheck:
+  #     test:
+  #       [
+  #         "CMD-SHELL",
+  #         "wget -qO- http://127.0.0.1:3000 >/dev/null || exit 1",
+  #       ]
+  #     interval: 30s
+  #     timeout: 5s
+  #     retries: 5
+  #     start_period: 30s
+
+  # -------------------
+  #
+  # Nginx Reverse Proxy.
+  #
+  # -------------------
+  nginx:
+    image: nginx:1.29.2-trixie
+    container_name: freelancing-clima-gen-nginx
+
+    networks:
+      - network
+
+    ports:
+      - "8865:80"
+
+    depends_on:
+      - python
+      - martin
+
+    # NGINX hace de proxy pero también sirve el frontend.
+    volumes:
+      - ./assets/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ..:/workspace

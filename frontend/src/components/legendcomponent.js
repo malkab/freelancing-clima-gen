@@ -3,7 +3,6 @@
  * Clase para la gestión de la leyenda.
  *
  */
-
 export default class LegendComponent {
 
     /**
@@ -19,28 +18,6 @@ export default class LegendComponent {
 
     }
 
-    /**
-     *
-     * Subscripción a eventos de la app.
-     *
-     * @param {MapComponent} mapComponent Eventos de mapa.
-     *
-     */
-    watchEvents(mapComponent) {
-
-        // Observamos cambios en el mapa.
-        mapComponent.onMapUpdated((event) => {
-            // Stops de color de variable_area.
-            var stops = this.getLayerColorStops(
-                event.detail.getStyle(),
-                "variable_area"
-            );
-
-            // Renderizamos leyenda.
-            this.renderLegend(stops, "Variable area");
-        });
-
-    }
 
     /**
      *
@@ -85,20 +62,26 @@ export default class LegendComponent {
 
     /**
      *
-     * Extrae los stops de la leyenda de la expresión `fill-color`
-     * de un layer.
+     * Extrae los stops de la leyenda de la expresión
+     * `fill-color` de un layer.
      *
-     * En un estilo de MapLibre fill-color como este se define como una expresión de interpolación, por ejemplo:
+     * En un estilo de MapLibre fill-color como este se define
+     * como una expresión de interpolación, por ejemplo:
      *
-     * "fill-color": [ "interpolate", ["linear"], ["to-number",
-     *     ["get", "field"]], 34,     "#2b83ba", 40,
-     *     "#abdda4", 70,     "#ffffbf", 90,     "#fdae61", 128,
-     *     "#d7191c"
+     * "fill-color": [
+     *      "interpolate", ["linear"],
+     *      ["to-number", ["get", "field"]],
+     *      34, "#2b83ba",
+     *      40, "#abdda4",
+     *      70, "#ffffbf",
+     *      90, "#fdae61",
+     *      128, "#d7191c"
      * ]
      *
      * @param {object} style Objeto de estilo de MapLibre.
      * @param {string} layerId La capa a inspeccionar.
-     * @returns {{ value: number, color: string }[]} Stops numéricos/colores extraídos.
+     * @returns {{ value: number, color: string }[]} Stops
+     * numéricos/colores extraídos.
      *
      */
     getLayerColorStops(style, layerId) {

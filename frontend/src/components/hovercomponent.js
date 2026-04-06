@@ -21,77 +21,115 @@ export default class HoverComponent {
 
     /**
      *
-     * Subscripciones a eventos de la aplicación.
-     *
-     * @param {MapComponent} mapComponent Map component emitter.
-     *
-     */
-    watchEvents(mapComponent) {
-
-        // Escuchamos los movimientos del ratón sobre el mapa.
-        mapComponent.onMouseMove((event) =>
-            this.handleMouseMove(event, "variable_area"));
-
-    }
-
-
-    /**
-     *
      * Refresco del hover al mover el ratón sobre el mapa.
      *
-     * @param {Event} event El evento de movimiento del ratón emitido por MapLibre.
-     * @param {string} layerId La layer a la que prestar atención para mostrar información de hover.
-     * @param {number} maxHoveredFeatures Número máximo de features a mostrar en el hover.
+     * @param {Event} event El evento de movimiento del ratón
+     * emitido por MapLibre.
+     * @param {string} layerId La layer a la que prestar atención
+     * para mostrar información de hover.
+     * @param {number} maxHoveredFeatures Número máximo de
+     * features a mostrar en el hover.
      *
      */
 
-    handleMouseMove(event, layerId, maxHoveredFeatures = 1) {
+    handleMouseMove(event, layerId, selectedVariable, selectedVariableLabel, maxHoveredFeatures = 1) {
 
-        // Extraemos la información relevante del evento: el de movimiento del ratón y el propio mapa.
-        var mouseEvent = event.detail.mouseevent;
-        var map = event.detail.map;
+        // El mapa que viene en el evento.
+        var map = event.target;
 
-        // Coordenadas
-        const { lng, lat } = mouseEvent.lngLat;
-
-        // Consultamos las features bajo el cursor, limitándonos a la capa de interés.
-        const features = map.queryRenderedFeatures(mouseEvent.point, {
+        // Consultamos las features bajo el cursor, limitándonos
+        // a la capa de interés.
+        const features = map.queryRenderedFeatures(event.point, {
             layers: [layerId],
         });
 
         // No hay nada.
         if (features.length === 0) {
             map.getCanvas().style.cursor = "crosshair";
-            this.hoverInfoContainer.textContent = `Lon: ${lng.toFixed(4)} | Lat: ${lat.toFixed(4)}\nNo geometry under cursor`;
+            this.hide();
             return;
         }
 
-        // Cambiamos el cursor para indicar que hay algo interactuable.
+        // Cambiamos el cursor para indicar que hay algo
+        // interactuable.
         map.getCanvas().style.cursor = "pointer";
 
-        // Preparamos la información de las features para mostrar en el hover, limitándonos al número máximo configurado.
-        const featurePayload = features.slice(0, maxHoveredFeatures).map((feature) => ({
-            id: feature.id ?? null,
-            layer: feature.layer.id,
-            source: feature.source,
-            sourceLayer: feature.sourceLayer ?? null,
-            geometryType: feature.geometry?.type ?? null,
-            properties: feature.properties,
-        }));
+        const selectedFeature = features.slice(0, maxHoveredFeatures)[0];
+        const variableKey = selectedVariable ?? "value";
+        const variableLabel = selectedVariableLabel ?? variableKey;
+        const variableValue = selectedFeature?.properties?.[variableKey];
+        const nameUnit =
+            selectedFeature?.properties?.nameunit
+            ?? selectedFeature?.properties?.NAMEUNIT
+            ?? selectedFeature?.properties?.name
+            ?? "-";
 
-        // Actualizamos el contenido del hover con la información de las coordenadas y las features encontradas bajo el cursor.
-        this.hoverInfoContainer.textContent = JSON.stringify(
-            {
-                coordinates: {
-                    lon: Number(lng.toFixed(6)),
-                    lat: Number(lat.toFixed(6)),
-                },
-                matchedFeatures: features.length,
-                features: featurePayload,
-            },
-            null,
-            2,
-        );
+        this.hoverInfoContainer.textContent = `${nameUnit}: ${this.formatValue(variableValue)}`;
+        this.show();
+        this.reposition(event.point, map);
+    }
+
+
+    handleMouseLeave(map) {
+        map.getCanvas().style.cursor = "";
+        this.hide();
+    }
+
+
+    reposition(point, map) {
+        if (!this.hoverInfoContainer) {
+            return;
+        }
+
+        const spacing = 14;
+        this.hoverInfoContainer.style.left = `${point.x + spacing}px`;
+        this.hoverInfoContainer.style.top = `${point.y + spacing}px`;
+
+        const tooltipRect = this.hoverInfoContainer.getBoundingClientRect();
+        const mapWidth = map.getContainer().clientWidth;
+        const mapHeight = map.getContainer().clientHeight;
+
+        let nextLeft = point.x + spacing;
+        let nextTop = point.y + spacing;
+
+        if (nextLeft + tooltipRect.width > mapWidth - spacing) {
+            nextLeft = point.x - tooltipRect.width - spacing;
+        }
+
+        if (nextTop + tooltipRect.height > mapHeight - spacing) {
+            nextTop = point.y - tooltipRect.height - spacing;
+        }
+
+        this.hoverInfoContainer.style.left = `${Math.max(spacing, nextLeft)}px`;
+        this.hoverInfoContainer.style.top = `${Math.max(spacing, nextTop)}px`;
+    }
+
+
+    formatValue(value) {
+        if (value === null || value === undefined || value === "") {
+            return "-";
+        }
+
+        const asNumber = Number(value);
+        if (Number.isFinite(asNumber)) {
+            return asNumber.toLocaleString("es-ES", { maximumFractionDigits: 3 });
+        }
+
+        return String(value);
+    }
+
+
+    show() {
+        if (this.hoverInfoContainer) {
+            this.hoverInfoContainer.style.display = "block";
+        }
+    }
+
+
+    hide() {
+        if (this.hoverInfoContainer) {
+            this.hoverInfoContainer.style.display = "none";
+        }
     }
 
 }
