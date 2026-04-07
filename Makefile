@@ -163,7 +163,7 @@ pg_dump:
 			-e PGPASSWORD=$$PGPASSWORD \
 			-e PGCLIENTENCODING=UTF8 \
 			-e PGOPTIONS='-c statement_timeout=0 -c idle_in_transaction_session_timeout=0' \
-			freelancing-clima-gen-postgres \
+			$(BASE_NAME)-postgres \
 			-b -F c -v -Z 9 \
 			--no-privileges \
 			-f $(DATE)-$(PG_DUMP_FILE)
@@ -220,4 +220,40 @@ docker_node_run_dev:
 		--user node \
 		$(BASE_NAME)-node \
 		npm run dev
+endif
+
+
+# Restauración de la base de datos.
+#
+# Selección de objetos, se pueden combinar múltiples opciones
+# según haga falta:
+#
+# Exportación de esquemas específicos: 		-n 'schema*'
+# Exportación de tablas específicas: 		-t 'schema*.table*'
+# Excluir esquemas específicos: 			-N 'schema*'
+# Excluir tablas específicas: 				-T 'schema*.table*'
+# Libre de owner y privilegios: 			--no-owner --no-privileges
+ifeq ($(INSIDE_CONTAINER),false)
+pg_restore:
+	$(LOAD_ENV)
+	read -p "¿Se ha configurado correctamente el restore, seguro que quiere restaurar [s/N]? " confirm
+	if [ "$$confirm" = "s" ]; then
+		docker run -ti --rm \
+			-v $(PWD):/workspace/ \
+			--workdir /workspace/ \
+			--entrypoint pg_restore \
+			--network $(BASE_NAME) \
+			-e PGHOST=$$PGHOST \
+			-e PGPORT=$$PGPORT \
+			-e PGUSER=$$PGUSER \
+			-e PGPASSWORD=$$PGPASSWORD \
+			-e PGCLIENTENCODING=UTF8 \
+			-e PGOPTIONS='-c statement_timeout=0 -c idle_in_transaction_session_timeout=0' \
+			$(BASE_NAME)-postgres \
+			-F c -v -j 8 \
+			--no-owner --no-privileges \
+			-d $$PGDATABASE \
+			$(PG_DUMP_FILE)
+	fi
+	echo "No olvidar restaurar usuarios y privilegios si es necesario y hacer un vacuum analyze."
 endif
