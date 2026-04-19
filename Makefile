@@ -24,11 +24,11 @@ TEST_ARGS ?=
 .PHONY:
 # Estos ficheros env se aplican en el orden dado y las variables en ellos se van
 # sobreescribiendo.
-ENV_FILES := ./.devcontainer/assets/env
+ENV_FILES := ./docker/assets/env
 # Nombre base de los objetos devcontainer, para los targets que manipulan los
 # contenedores.
 BASE_NAME := freelancing-clima-gen
-PG_DUMP_FILE := climagen.pgdump
+PG_DUMP_FILE := 20260419_123422-climagen.pgdump
 
 
 # ----------------------------------
@@ -53,7 +53,7 @@ endef
 # ----------------------------------
 # Exec en Python.
 ifeq ($(INSIDE_CONTAINER),false)
-docker_exec_python:
+docker-exec-python:
 	$(LOAD_ENV)
 	docker exec -ti \
 		--workdir /workspace \
@@ -64,7 +64,7 @@ endif
 
 # Exec en Node.
 ifeq ($(INSIDE_CONTAINER),false)
-docker_exec_node:
+docker-exec-node:
 	$(LOAD_ENV)
 	docker exec -ti \
 		--user node \
@@ -76,10 +76,10 @@ endif
 
 # Arranca el Compose.
 ifeq ($(INSIDE_CONTAINER),false)
-docker_compose_up:
+docker-compose-up:
 	$(LOAD_ENV)
 	docker compose \
-		-f .devcontainer/docker-compose.yml \
+		-f docker/docker-compose.yml \
 		-p $(BASE_NAME) \
 		up -d
 endif
@@ -87,10 +87,10 @@ endif
 
 # Apaga el Compose.
 ifeq ($(INSIDE_CONTAINER),false)
-docker_compose_down:
+docker-compose-down:
 	$(LOAD_ENV)
 	docker compose \
-		-f .devcontainer/docker-compose.yml \
+		-f docker/docker-compose.yml \
 		-p $(BASE_NAME) \
 		down
 endif
@@ -98,7 +98,7 @@ endif
 
 # Para los contenedores.
 ifeq ($(INSIDE_CONTAINER),false)
-docker_containers_stop:
+docker-containers-stop:
 	$(LOAD_ENV)
 	docker ps --filter name=$(BASE_NAME)* -q | xargs -r docker stop
 endif
@@ -106,7 +106,7 @@ endif
 
 # Limpia contenedores.
 ifeq ($(INSIDE_CONTAINER),false)
-docker_containers_rm:
+docker-containers-rm:
 	$(LOAD_ENV)
 	read -p "¿Eliminar contenedores [s/N]? " confirm
 	if [ "$$confirm" = "s" ]; then
@@ -118,7 +118,7 @@ endif
 
 # psql.
 ifeq ($(INSIDE_CONTAINER),false)
-pg_psql:
+pg-psql:
 	$(LOAD_ENV)
 	docker run -ti --rm \
 		--workdir /workspace \
@@ -136,7 +136,7 @@ endif
 
 # ¡MUCHO CUIDADO! Tira los volúmenes.
 ifeq ($(INSIDE_CONTAINER),false)
-docker_volume_rm:
+docker-volume-rm:
 	$(LOAD_ENV)
 	read -p "¿Eliminar volúmenes [s/N]? " confirm
 	if [ "$$confirm" = "s" ]; then
@@ -147,7 +147,7 @@ endif
 
 # PG backup.
 ifeq ($(INSIDE_CONTAINER),false)
-pg_dump:
+pg-dump:
 	$(LOAD_ENV)
 	read -p "¿Se ha configurado correctamente el backup [s/N]? " confirm
 	if [ "$$confirm" = "s" ]; then
@@ -174,7 +174,7 @@ endif
 # Borra todo rastro del Compose salvo los volúmenes, aunque
 # borrar los volúmenes huérfanos.
 ifeq ($(INSIDE_CONTAINER),false)
-docker_compose_rm:
+docker-compose-rm:
 	$(LOAD_ENV)
 	read -p "¿Eliminar infraestructura Docker (salvo volúmenes) [s/N]? " confirm
 	if [ "$$confirm" = "s" ]; then
@@ -189,7 +189,7 @@ endif
 
 # Logs de la API Python.
 ifeq ($(INSIDE_CONTAINER),false)
-docker_logs_python:
+docker-logs-python:
 	$(LOAD_ENV)
 	docker logs -f $(BASE_NAME)-python
 endif
@@ -197,7 +197,7 @@ endif
 
 # Logs de NGINX.
 ifeq ($(INSIDE_CONTAINER),false)
-docker_logs_nginx:
+docker-logs-nginx:
 	$(LOAD_ENV)
 	docker logs -f $(BASE_NAME)-nginx
 endif
@@ -205,15 +205,23 @@ endif
 
 # Reiniciar el NGINX.
 ifeq ($(INSIDE_CONTAINER),false)
-docker_restart_nginx:
+docker-restart-nginx:
 	$(LOAD_ENV)
 	docker restart $(BASE_NAME)-nginx
 endif
 
 
+# Reiniciar el NGINX.
+ifeq ($(INSIDE_CONTAINER),false)
+docker-restart-martin:
+	$(LOAD_ENV)
+	docker restart $(BASE_NAME)-martin
+endif
+
+
 # Ejecución del servidor de desarrollo.
 ifeq ($(INSIDE_CONTAINER),false)
-docker_node_run_dev:
+docker-node-run-dev:
 	$(LOAD_ENV)
 	docker exec -ti \
 		--workdir /workspace/frontend \
@@ -234,7 +242,7 @@ endif
 # Excluir tablas específicas: 				-T 'schema*.table*'
 # Libre de owner y privilegios: 			--no-owner --no-privileges
 ifeq ($(INSIDE_CONTAINER),false)
-pg_restore:
+pg-restore:
 	$(LOAD_ENV)
 	read -p "¿Se ha configurado correctamente el restore, seguro que quiere restaurar [s/N]? " confirm
 	if [ "$$confirm" = "s" ]; then

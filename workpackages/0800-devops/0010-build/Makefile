@@ -37,7 +37,8 @@ PG_DUMP_FILE := dump_file.pgdump
 CODE_BASE_DIR := $(PWD)/../../..
 
 # Versiones imágenes básicas.
-NGINX_VERSION_DOCKER_TAG := 1.29.2-trixie
+NGINX_PRODUCTION_DOCKER_TAG := 1.30.0-alpine3.23
+NODE_BUILD_DOCKER_TAG := trixie
 
 
 
@@ -62,29 +63,35 @@ endef
 #
 # ------------------------------
 # Mega build
-build: build_nginx
+build: build_frontend
 
 
-# Build del Airflow
-build_nginx:
+# Build del frontend
+build-frontend:
 	$(LOAD_ENV)
 
-	docker pull nginx:$$NGINX_VERSION_DOCKER_TAG
+	docker pull nginx:$(NGINX_PRODUCTION_DOCKER_TAG)
+	docker pull node:$(NODE_BUILD_DOCKER_TAG)
 
+	docker run --rm \
+		-v ${CODE_BASE_DIR}/frontend:/workspace/frontend \
+		--workdir /workspace/frontend \
+		--entrypoint /bin/bash \
+		--user node:node \
+		node:$$NODE_BUILD_DOCKER_TAG \
+		-c "npm install ; npm run build"
+
+	rm -rf ./assets/nginx/src
 	mkdir -p ./assets/nginx/src
 
 	rsync -ravhP --info=progress2 --delete --delete-excluded \
-		--exclude='**/__pycache__' \
-		--exclude='**/geo_ingest/' \
-		--exclude='**/logs/**' \
-		--exclude='.gitignore' \
 		${CODE_BASE_DIR}/frontend/dist/ \
 		./assets/nginx/src
 
 	cd ./assets/nginx
 
 	docker build \
-		--build-arg TAG=$$NGINX_VERSION_DOCKER_TAG \
+		--build-arg TAG=$(NGINX_PRODUCTION_DOCKER_TAG) \
 		-t clima-gen-nginx:latest .
 
 

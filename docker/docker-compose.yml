@@ -3,8 +3,10 @@ networks:
     name: freelancing-clima-gen
 
 volumes:
-  postgres-data:
+  postgres-data-heavy:
     name: freelancing-clima-gen-postgres-data
+  postgres-data-light:
+    name: freelancing-clima-gen-postgres-data-light
 
 services:
   # -------------------
@@ -47,16 +49,18 @@ services:
     shm_size: "2GB"
 
     ports:
-      - "5432:5432"
+      - "5732:5432"
 
     environment:
       - POSTGRES_PASSWORD=postgres
 
     volumes:
-      - postgres-data:/var/lib/postgresql/
+      - postgres-data-light:/var/lib/postgresql/
       - ..:/workspace
-      - ./assets/postgres/postgresql.conf:/etc/postgresql/postgresql.conf
+      - ./assets/postgres/postgresql-light.conf:/etc/postgresql/postgresql.conf
       - ./assets/postgres/db_setup.sql:/docker-entrypoint-initdb.d/db_setup.sql
+      # - postgres-data-heavy:/var/lib/postgresql/
+      #- ./assets/postgres/postgresql-heavy.conf:/etc/postgresql/postgresql.conf
 
     networks:
       - network
