@@ -34,6 +34,8 @@ services:
 
     volumes:
       - ..:/workspace/
+      - /home/malkab/opencode-data/config/:/home/vscode/.config/opencode/
+      - /home/malkab/opencode-data/auth/:/home/vscode/.local/share/opencode/
 
   # -------------------
   #

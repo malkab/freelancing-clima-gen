@@ -27,6 +27,10 @@ RUN pip install "GDAL==$(gdal-config --version).*"
 
 USER vscode
 
+# Instalamos OpenCode.
+RUN mkdir -p /home/vscode/.local/share/opencode/
+RUN curl -fsSL https://opencode.ai/install | bash
+
 WORKDIR /workspace/api
 EXPOSE 8000
 

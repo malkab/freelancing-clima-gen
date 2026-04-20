@@ -303,3 +303,15 @@ pg-restore:
 	fi
 	echo "No olvidar restaurar usuarios y privilegios si es necesario y hacer un vacuum analyze."
 endif
+
+
+# OpenCode.
+ifeq ($(INSIDE_CONTAINER),false)
+docker-exec-opencode:
+	$(LOAD_ENV)
+	docker exec -ti \
+		--workdir /workspace \
+		--user vscode \
+		$(BASE_NAME)-python \
+		/bin/bash -c "/home/vscode/.opencode/bin/opencode"
+endif
