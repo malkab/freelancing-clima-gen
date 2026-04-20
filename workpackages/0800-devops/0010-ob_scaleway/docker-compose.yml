@@ -1,0 +1,116 @@
+networks:
+  network:
+    name: clima-gen
+
+volumes:
+  postgres-data:
+    name: clima-gen-postgres-data
+
+services:
+  # -------------------
+  #
+  # Nginx.
+  #
+  # -------------------
+  nginx:
+    image: clima-gen-nginx
+    container_name: clima-gen-nginx
+
+    ports:
+      - "80:80"
+
+    volumes:
+      - ./assets/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./assets/nginx/runtime-config.json:/app/runtime-config.json
+
+    networks:
+      - network
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+
+  # -------------------
+  #
+  # API.
+  #
+  # -------------------
+  api:
+    image: clima-gen-api
+    container_name: clima-gen-api
+    env_file:
+      - assets/env
+
+    ports:
+      - "8000:8000"
+
+    networks:
+      - network
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # -------------------
+  #
+  # PostgreSQL.
+  #
+  # -------------------
+  postgres:
+    image: clima-gen-postgres
+    container_name: clima-gen-postgres
+    shm_size: "3GB"
+    env_file:
+      - assets/env
+
+    volumes:
+      - postgres-data:/var/lib/postgresql/
+      - ./assets/postgresql/postgresql.conf:/etc/postgresql/postgresql.conf:ro
+
+    networks:
+      - network
+
+    healthcheck:
+      test: PGPASSWORD="${PGPASSWORD}" psql -U postgres -tAc 'select 1' -d postgres
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # -------------------
+  #
+  # MapLibre Martin.
+  #
+  # -------------------
+  martin:
+    image: ghcr.io/maplibre/martin:v0.16.0
+    container_name: clima-gen-martin
+    restart: unless-stopped
+    command: ["--config", "/config.yaml"]
+    env_file:
+      - ./assets/env
+
+    networks:
+      - network
+
+    ports:
+      - "3000:3000"
+
+    volumes:
+      - ./assets/martin/config.yaml:/config.yaml
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "wget -qO- http://127.0.0.1:3000 >/dev/null || exit 1",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s

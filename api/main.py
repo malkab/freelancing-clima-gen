@@ -8,11 +8,11 @@ from psycopg.rows import dict_row
 
 app = FastAPI(title="API", version="0.1.0")
 
-DB_HOST = os.getenv("DB_HOST", "postgres")
-DB_PORT = int(os.getenv("DB_PORT", "5432"))
-DB_NAME = os.getenv("DB_NAME", "climagen")
-DB_USER = os.getenv("DB_USER", "postgres")
-DB_PASSWORD = os.getenv("DB_PASSWORD", "postgres")
+DB_HOST = os.getenv("PGHOST", "postgres")
+DB_PORT = int(os.getenv("PGPORT", "5432"))
+DB_NAME = os.getenv("PGDATABASE", "climagen")
+DB_USER = os.getenv("PGUSER", "postgres")
+DB_PASSWORD = os.getenv("PGPASSWORD", "postgres")
 
 
 @app.get("/api/v1/health")

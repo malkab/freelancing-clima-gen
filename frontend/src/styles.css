@@ -109,6 +109,7 @@ body {
     flex-direction: column;
     gap: 2px;
     margin-right: auto;
+    visibility: hidden;
 }
 
 .footer-legal-title,
@@ -250,6 +251,7 @@ body {
     background: rgba(255, 255, 255, 0.92);
     color: #111827;
     box-shadow: 0 4px 18px rgba(0, 0, 0, 0.22);
+    visibility: hidden;
 }
 
 .map-legend-title {

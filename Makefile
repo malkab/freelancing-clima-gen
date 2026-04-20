@@ -145,7 +145,18 @@ docker-volume-rm:
 endif
 
 
-# PG backup.
+# Respaldo de la base de datos.
+#
+# Selección de objetos, se pueden combinar múltiples opciones
+# según haga falta:
+#
+#
+# Exportación de esquemas específicos: 		-n 'schema*'
+# Exportación de tablas específicas: 		-t 'schema*.table*'
+# Excluir esquemas específicos: 			-N 'schema*'
+# Excluir tablas específicas: 				-T 'schema*.table*'
+#
+# ¡Ojo! Los -n y los -t no se pueden mezclar.
 ifeq ($(INSIDE_CONTAINER),false)
 pg-dump:
 	$(LOAD_ENV)
@@ -167,6 +178,33 @@ pg-dump:
 			-b -F c -v -Z 9 \
 			--no-privileges \
 			-f $(DATE)-$(PG_DUMP_FILE)
+	fi
+endif
+
+
+# Dump excluyendo el esquema raw.
+ifeq ($(INSIDE_CONTAINER),false)
+pg-dump-produccion:
+	$(LOAD_ENV)
+	read -p "¿Se ha configurado correctamente el backup [s/N]? " confirm
+	if [ "$$confirm" = "s" ]; then
+		docker run -ti --rm \
+			-v $(PWD):/workspace/ \
+			--workdir /workspace/ \
+			--entrypoint pg_dump \
+			--network $(BASE_NAME) \
+			-e PGHOST=$$PGHOST \
+			-e PGPORT=$$PGPORT \
+			-e PGUSER=$$PGUSER \
+			-e PGDATABASE=$$PGDATABASE \
+			-e PGPASSWORD=$$PGPASSWORD \
+			-e PGCLIENTENCODING=UTF8 \
+			-e PGOPTIONS='-c statement_timeout=0 -c idle_in_transaction_session_timeout=0' \
+			$(BASE_NAME)-postgres \
+			-b -F c -v -Z 9 \
+			-N raw \
+			--no-privileges \
+			-f $(DATE)-climagen-produccion.pgdump
 	fi
 endif
 

@@ -4,6 +4,7 @@
  *
  */
 
+import maplibregl from "./lib/maplibre/maplibre-gl";
 import mapStyle from "./assets/map.json";
 import MapLibreHelpers from "./lib/maplibrehelpers.js";
 import LegendComponent from "./components/legendcomponent.js";
