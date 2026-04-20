@@ -1,6 +1,6 @@
 {
-  "martinBaseUrl": "http://localhost/martin/",
-  "apiBaseUrl": "http://localhost/api/v1/",
+  "martinBaseUrl": "https://proyectoclimagen.es/martin/",
+  "apiBaseUrl": "https://proyectoclimagen.es/api/v1/",
   "selectedTerritory": "municipio",
   "selectedVariable": "indice_clima_gen_sin_cambio_climatico",
   "maxBounds": [ [-20, 27], [6, 44] ],

@@ -1,0 +1,10 @@
+__pycache__
+assets/api
+assets/nginx/src
+assets/nginx/.gitignore
+assets/nginx/Dockerfile
+assets/postgresql/db_setup.sql
+assets/postgresql/Dockerfile
+assets/.gitignore
+assets/env.configure
+rsync-exclude

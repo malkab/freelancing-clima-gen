@@ -5,6 +5,13 @@ networks:
 volumes:
   postgres-data:
     name: clima-gen-postgres-data
+    external: true
+  letsencrypt-data:
+    name: clima-gen-letsencrypt-data
+    external: true
+  certbot-www:
+    name: clima-gen-certbot-www
+    external: true
 
 services:
   # -------------------
@@ -15,13 +22,17 @@ services:
   nginx:
     image: clima-gen-nginx
     container_name: clima-gen-nginx
+    restart: unless-stopped
 
     ports:
       - "80:80"
+      - "443:443"
 
     volumes:
       - ./assets/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./assets/nginx/runtime-config.json:/app/runtime-config.json
+      - letsencrypt-data:/etc/letsencrypt
+      - certbot-www:/var/www/certbot
 
     networks:
       - network
@@ -29,6 +40,13 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1/nginx-healthz >/dev/null || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
 
   # -------------------
@@ -41,9 +59,6 @@ services:
     container_name: clima-gen-api
     env_file:
       - assets/env
-
-    ports:
-      - "8000:8000"
 
     networks:
       - network
@@ -94,9 +109,6 @@ services:
     networks:
       - network
 
-    ports:
-      - "3000:3000"
-
     volumes:
       - ./assets/martin/config.yaml:/config.yaml
 
@@ -114,3 +126,34 @@ services:
       timeout: 5s
       retries: 5
       start_period: 30s
+
+
+  # -------------------
+  #
+  # Certbot.
+  #
+  # -------------------
+  certbot:
+    image: certbot/certbot:v2.11.0
+    container_name: clima-gen-certbot
+    restart: unless-stopped
+
+    volumes:
+      - letsencrypt-data:/etc/letsencrypt
+      - certbot-www:/var/www/certbot
+
+    pid: "service:nginx"
+
+    entrypoint: /bin/sh
+    command: >
+      -c 'while :; do
+      certbot renew --webroot -w /var/www/certbot --quiet
+      --deploy-hook "kill -HUP 1";
+      sleep 1d;
+      done'
+
+    depends_on:
+      nginx:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy

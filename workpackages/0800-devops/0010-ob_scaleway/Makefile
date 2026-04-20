@@ -8,12 +8,9 @@
 .ONESHELL:
 SHELL := /bin/bash
 PWD := $(shell pwd)
-INSIDE_CONTAINER := $(shell [ -f /.dockerenv ] && echo true || echo false)
 DATE := $(shell date +%Y%m%d_%H%M%S)
-RUFF_NO_COLOR ?= 0
-RUFF_ENV := $(if $(filter 1,$(RUFF_NO_COLOR)),NO_COLOR=1,)
-TEST_PATH ?= src
-TEST_ARGS ?=
+HOSTNAME := $(strip $(shell hostname -s))
+PROD_HOSTNAME := ubuntu
 
 
 # ----------------------------------
@@ -21,9 +18,6 @@ TEST_ARGS ?=
 # Configuración.
 #
 # ----------------------------------
-# Los targets phony son aquellos que no hacen referencia a ningún
-# fichero a compilar.
-.PHONY:
 # Estos ficheros env se aplican en el orden dado y las variables
 # en ellos se van sobreescribiendo. Las variables que se definen
 # aquí se expanden con $$VARIABLE
@@ -44,7 +38,6 @@ NODE_BUILD_DOCKER_TAG := trixie
 PYTHON_API_DOCKER_TAG := 3.12-slim
 
 
-
 # ----------------------------------
 #
 # Funciones auxiliares.
@@ -62,9 +55,15 @@ endef
 
 # ------------------------------
 #
-# Targets.
+# Targets específicos del host remoto.
 #
 # ------------------------------
+ifeq ($(HOSTNAME),$(PROD_HOSTNAME))
+
+
+.PHONY: docker-compose-up docker-compose-down docker-compose-rm tls-init tls-status pg-psql pg-init pg-restore images-load docker-volume-mount
+
+
 # Arranca un Compose con un perfil opcional.
 docker-compose-up:
 	$(LOAD_ENV)
@@ -94,6 +93,181 @@ docker-compose-rm:
 		docker network ls --filter name=$(BASE_NAME) -q | xargs -r docker network rm
 		docker volume prune -f
 	fi
+
+
+# Primera emisión de certificado TLS con Let's Encrypt.
+tls-init:
+	$(LOAD_ENV)
+	if [ -z "$$LETSENCRYPT_DOMAIN" ] || [ -z "$$LETSENCRYPT_EMAIL" ]; then
+		echo "Defina LETSENCRYPT_DOMAIN y LETSENCRYPT_EMAIL en assets/env";
+		exit 1;
+	fi
+
+	DOMAIN_ARGS="-d $$LETSENCRYPT_DOMAIN"
+	if [ -n "$$LETSENCRYPT_DOMAIN_WWW" ]; then
+		DOMAIN_ARGS="$$DOMAIN_ARGS -d $$LETSENCRYPT_DOMAIN_WWW"
+	fi
+
+	STAGING_FLAG=""
+	if [ "$$LETSENCRYPT_STAGING" = "1" ]; then
+		STAGING_FLAG="--staging"
+	fi
+
+	docker volume create clima-gen-letsencrypt-data
+	docker volume create clima-gen-certbot-www
+
+	docker run -d \
+		--name $(BASE_NAME)-nginx-tls-init \
+		-p 80:80 \
+		-v clima-gen-letsencrypt-data:/etc/letsencrypt \
+		-v clima-gen-certbot-www:/var/www/certbot \
+		-v ./assets/nginx/nginx-tls-init.conf:/etc/nginx/nginx.conf:ro \
+		$(BASE_NAME)-nginx:latest
+
+	docker run --rm \
+		-v clima-gen-certbot-www:/var/www/certbot \
+		--entrypoint /bin/sh \
+		certbot/certbot:v2.11.0 \
+		-c 'mkdir -p /var/www/certbot/.well-known/acme-challenge && echo preflight-ok > /var/www/certbot/.well-known/acme-challenge/preflight'
+
+	curl -fsS "http://$$LETSENCRYPT_DOMAIN/.well-known/acme-challenge/preflight" >/dev/null || { \
+		echo "Preflight ACME check failed: no se puede resolver /.well-known/acme-challenge/preflight"; \
+		echo "Revise DNS, apertura de puerto 80 y configuración de NGINX para webroot ACME."; \
+		exit 1; \
+	}
+
+	docker run -ti \
+		--name $(BASE_NAME)-certbot-init \
+	    -v clima-gen-letsencrypt-data:/etc/letsencrypt \
+      	-v clima-gen-certbot-www:/var/www/certbot \
+		--entrypoint certbot \
+		certbot/certbot:v2.11.0 \
+		certonly --webroot -w /var/www/certbot \
+  			--preferred-challenges http \
+  			--cert-name default \
+  			--email $$LETSENCRYPT_EMAIL \
+  			--agree-tos --no-eff-email \
+  			$$DOMAIN_ARGS
+
+	docker stop $(BASE_NAME)-nginx-tls-init
+	docker rm $(BASE_NAME)-nginx-tls-init $(BASE_NAME)-certbot-init
+
+
+# Muestra la caducidad actual del certificado activo.
+tls-status:
+	$(LOAD_ENV)
+	docker compose -f docker-compose.yml -p $(BASE_NAME) exec nginx \
+		openssl x509 -in /etc/letsencrypt/live/default/fullchain.pem -noout -issuer -subject -dates
+
+
+# psql.
+pg-psql:
+	$(LOAD_ENV)
+	docker run -ti --rm \
+		--workdir /workspace \
+		-v $(PWD):/workspace \
+		--network $(BASE_NAME) \
+		--entrypoint psql \
+		-e PGHOST=$$PGHOST \
+		-e PGPORT=$$PGPORT \
+		-e PGUSER=$$PGUSER \
+		-e PGDATABASE=$$PGDATABASE \
+		-e PGPASSWORD=$$PGPASSWORD \
+		$(BASE_NAME)-postgres
+
+
+# Inicializa la base de datos.
+pg-init:
+	$(LOAD_ENV)
+	docker volume create clima-gen-postgres-data2
+
+	docker run -d \
+		--name $(BASE_NAME)-postgres-init \
+		-v $(PWD):/workspace/ \
+		--workdir /workspace/ \
+      	-v clima-gen-postgres-data2:/var/lib/postgresql/ \
+      	-v ./assets/postgresql/postgresql.conf:/etc/postgresql/postgresql.conf:ro \
+		$(BASE_NAME)-postgres
+
+	sleep 30
+
+	docker exec -ti \
+		-e PGHOST=localhost \
+		-e PGPORT=$$PGPORT \
+		-e PGUSER=$$PGUSER \
+		-e PGPASSWORD=$$PGPASSWORD \
+		-e PGCLIENTENCODING=UTF8 \
+		-e PGOPTIONS='-c statement_timeout=0 -c idle_in_transaction_session_timeout=0' \
+		$(BASE_NAME)-postgres-init \
+		pg_restore \
+			-F c -v -j 8 \
+			--no-owner --no-privileges \
+			-d $$PGDATABASE \
+			$(PG_DUMP_FILE)
+
+
+# Restore database.
+pg-restore:
+	$(LOAD_ENV)
+	read -p "¿Se ha configurado correctamente el restore, seguro que quiere restaurar [s/N]? " confirm
+	if [ "$$confirm" = "s" ]; then
+		docker run -ti --rm \
+			-v $(PWD):/workspace/ \
+			--workdir /workspace/ \
+			--entrypoint pg_restore \
+			--network $(BASE_NAME) \
+			-e PGHOST=$$PGHOST \
+			-e PGPORT=$$PGPORT \
+			-e PGUSER=$$PGUSER \
+			-e PGPASSWORD=$$PGPASSWORD \
+			-e PGCLIENTENCODING=UTF8 \
+			-e PGOPTIONS='-c statement_timeout=0 -c idle_in_transaction_session_timeout=0' \
+			$(BASE_NAME)-postgres \
+			-F c -v -j 8 \
+			--no-owner --no-privileges \
+			-d $$PGDATABASE \
+			$(PG_DUMP_FILE)
+	fi
+	echo "No olvidar restaurar usuarios y privilegios si es necesario y hacer un vacuum analyze."
+
+
+# Carga las imágenes.
+images-load:
+	$(LOAD_ENV)
+
+	cd ./images/
+
+	docker image load < $(BASE_NAME)-nginx.tar.gz
+	docker image load < $(BASE_NAME)-postgres.tar.gz
+	docker image load < martin.tar.gz
+	docker image load < $(BASE_NAME)-api.tar.gz
+	docker image load < certbot.tar.gz
+
+
+# Montaje de volúmenes.
+docker-volume-mount:
+	$(LOAD_ENV)
+	docker run -ti --rm \
+		--entrypoint /bin/bash \
+		--workdir / \
+		-v clima-gen-postgres-data:/volume-clima-gen-postgres-data \
+		-v clima-gen-letsencrypt-data:/volume-clima-gen-letsencrypt-data \
+		-v clima-gen-certbot-www:/volume-clima-gen-certbot-www \
+		clima-gen-api:latest
+
+
+endif
+
+
+# ------------------------------
+#
+# Targets específicos del host de build.
+#
+# ------------------------------
+ifneq ($(HOSTNAME),$(PROD_HOSTNAME))
+
+
+.PHONY: build build-frontend build-api build-postgres images-save rsync-delete-dryrun rsync-delete
 
 
 # Mega build
@@ -165,50 +339,11 @@ build-postgres:
 		-t $(BASE_NAME)-postgres:latest .
 
 
-# psql.
-pg-psql:
-	$(LOAD_ENV)
-	docker run -ti --rm \
-		--workdir /workspace \
-		-v $(PWD):/workspace \
-		--network $(BASE_NAME) \
-		--entrypoint psql \
-		-e PGHOST=$$PGHOST \
-		-e PGPORT=$$PGPORT \
-		-e PGUSER=$$PGUSER \
-		-e PGDATABASE=$$PGDATABASE \
-		-e PGPASSWORD=$$PGPASSWORD \
-		$(BASE_NAME)-postgres
-
-
-# Restore database.
-pg-restore:
-	$(LOAD_ENV)
-	read -p "¿Se ha configurado correctamente el restore, seguro que quiere restaurar [s/N]? " confirm
-	if [ "$$confirm" = "s" ]; then
-		docker run -ti --rm \
-			-v $(PWD):/workspace/ \
-			--workdir /workspace/ \
-			--entrypoint pg_restore \
-			--network $(BASE_NAME) \
-			-e PGHOST=$$PGHOST \
-			-e PGPORT=$$PGPORT \
-			-e PGUSER=$$PGUSER \
-			-e PGPASSWORD=$$PGPASSWORD \
-			-e PGCLIENTENCODING=UTF8 \
-			-e PGOPTIONS='-c statement_timeout=0 -c idle_in_transaction_session_timeout=0' \
-			$(BASE_NAME)-postgres \
-			-F c -v -j 8 \
-			--no-owner --no-privileges \
-			-d $$PGDATABASE \
-			$(PG_DUMP_FILE)
-	fi
-	echo "No olvidar restaurar usuarios y privilegios si es necesario y hacer un vacuum analyze."
-
-
 # Guardar las imágenes Docker.
 images-save:
 	$(LOAD_ENV)
+
+	docker pull certbot/certbot:v2.11.0
 
 	rm -Rf images
 	mkdir -p images
@@ -216,9 +351,31 @@ images-save:
 	cd ./images/
 
 	docker save $(BASE_NAME)-nginx:latest | gzip > $(BASE_NAME)-nginx.tar.gz
-
 	docker save $(BASE_NAME)-postgres:latest | gzip > $(BASE_NAME)-postgres.tar.gz
-
 	docker save ghcr.io/maplibre/martin:v0.16.0 | gzip > martin.tar.gz
-
 	docker save $(BASE_NAME)-api:latest | gzip > $(BASE_NAME)-api.tar.gz
+	docker save certbot/certbot:v2.11.0 | gzip > certbot.tar.gz
+
+
+# rsync delete dry.
+rsync-delete-dryrun:
+	$(LOAD_ENV)
+	rsync -ravhPz --info=progress2 --delete --delete-excluded --dry-run \
+		--exclude-from="${PWD}/rsync-exclude" \
+		"${PWD}/" \
+		"$$SSH_HOST:$$DEPLOYMENT_FOLDER/"
+
+
+# rsync delete.
+rsync-delete:
+	$(LOAD_ENV)
+	read -p "¡OJO! Este rsync es destructivo. Comprobar primero con rsync-dryrun_delete. ¿Continuar [s/N]? " confirm
+	if [ "$$confirm" = "s" ]; then
+		rsync -ravhPz --info=progress2 --delete --delete-excluded \
+			--exclude-from="${PWD}/rsync-exclude" \
+			"${PWD}/" \
+			"$$SSH_HOST:$$DEPLOYMENT_FOLDER/"
+	fi
+
+
+endif
