@@ -20,10 +20,6 @@ make docker-images-load
 # Inicialización de la base de datos
 make pg-init
 
-# Inicialización de TLS con Let's Encrypt
-make tls-init
-make tls-status
-
 # Arranque del Compose
 make docker-compose-up
 ```

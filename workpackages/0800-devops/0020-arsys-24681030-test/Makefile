@@ -22,11 +22,10 @@ PROD_HOSTNAME := ubuntu
 # en ellos se van sobreescribiendo. Las variables que se definen
 # aquí se expanden con $$VARIABLE.
 ENV_FILES := ./assets/env_files/postgresql.env \
-			 ./assets/env_files/deployment.env \
-			 ./assets/env_files/tls.env
+			 ./assets/env_files/deployment.env
 # Nombre base de los objetos devcontainer, para los targets que
 # manipulan los contenedores.
-BASE_NAME := clima-gen
+BASE_NAME := clima-gen-test
 PG_DUMP_FILE := climagen-produccion.pgdump
 
 # Directorio de la base de código.
@@ -36,7 +35,6 @@ CODE_BASE_DIR := $(PWD)/../../..
 NGINX_PRODUCTION_DOCKER_TAG := 1.30.0-alpine3.23
 POSTGRES_PRODUCTION_DOCKER_TAG := 18-3.6
 MARTIN_PRODUCTION_DOCKER_TAG := 1.6.0
-CERTBOT_PRODUCTION_DOCKER_TAG := v2.11.0
 PYTHON_API_PRODUCTION_DOCKER_TAG := 3.12-slim
 NODE_BUILD_DOCKER_TAG := trixie
 
@@ -64,7 +62,7 @@ endef
 ifeq ($(HOSTNAME),$(PROD_HOSTNAME))
 
 
-.PHONY: docker-compose-up docker-compose-down docker-compose-rm tls-init tls-status pg-psql pg-init pg-restore images-load docker-volume-mount
+.PHONY: docker-compose-up docker-compose-down docker-compose-rm pg-psql pg-init pg-restore docker-images-load docker-volume-mount
 
 
 # Arranca un Compose con un perfil opcional.
@@ -96,71 +94,6 @@ docker-compose-rm:
 		docker network ls --filter name=$(BASE_NAME) -q | xargs -r docker network rm
 		docker volume prune -f
 	fi
-
-
-# Primera emisión de certificado TLS con Let's Encrypt.
-tls-init:
-	$(LOAD_ENV)
-	if [ -z "$$LETSENCRYPT_DOMAIN" ] || [ -z "$$LETSENCRYPT_EMAIL" ]; then
-		echo "Defina LETSENCRYPT_DOMAIN y LETSENCRYPT_EMAIL en assets/env";
-		exit 1;
-	fi
-
-	DOMAIN_ARGS="-d $$LETSENCRYPT_DOMAIN"
-	if [ -n "$$LETSENCRYPT_DOMAIN_WWW" ]; then
-		DOMAIN_ARGS="$$DOMAIN_ARGS -d $$LETSENCRYPT_DOMAIN_WWW"
-	fi
-
-	STAGING_FLAG=""
-	if [ "$$LETSENCRYPT_STAGING" = "1" ]; then
-		STAGING_FLAG="--staging"
-	fi
-
-	docker volume create clima-gen-letsencrypt-data
-	docker volume create clima-gen-certbot-www
-
-	docker run -d \
-		--name $(BASE_NAME)-nginx-tls-init \
-		-p 80:80 \
-		-v clima-gen-letsencrypt-data:/etc/letsencrypt \
-		-v clima-gen-certbot-www:/var/www/certbot \
-		-v ./assets/nginx/nginx-tls-init.conf:/etc/nginx/nginx.conf:ro \
-		$(BASE_NAME)-nginx:latest
-
-	docker run --rm \
-		-v clima-gen-certbot-www:/var/www/certbot \
-		--entrypoint /bin/sh \
-		certbot/certbot:$(CERTBOT_PRODUCTION_DOCKER_TAG) \
-		-c 'mkdir -p /var/www/certbot/.well-known/acme-challenge && echo preflight-ok > /var/www/certbot/.well-known/acme-challenge/preflight'
-
-	curl -fsS "http://$$LETSENCRYPT_DOMAIN/.well-known/acme-challenge/preflight" >/dev/null || { \
-		echo "Preflight ACME check failed: no se puede resolver /.well-known/acme-challenge/preflight"; \
-		echo "Revise DNS, apertura de puerto 80 y configuración de NGINX para webroot ACME."; \
-		exit 1; \
-	}
-
-	docker run -ti \
-		--name $(BASE_NAME)-certbot-init \
-	    -v clima-gen-letsencrypt-data:/etc/letsencrypt \
-      	-v clima-gen-certbot-www:/var/www/certbot \
-		--entrypoint certbot \
-		certbot/certbot:$(CERTBOT_PRODUCTION_DOCKER_TAG) \
-		certonly --webroot -w /var/www/certbot \
-  			--preferred-challenges http \
-  			--cert-name default \
-  			--email $$LETSENCRYPT_EMAIL \
-  			--agree-tos --no-eff-email \
-  			$$DOMAIN_ARGS
-
-	docker stop $(BASE_NAME)-nginx-tls-init
-	docker rm $(BASE_NAME)-nginx-tls-init $(BASE_NAME)-certbot-init
-
-
-# Muestra la caducidad actual del certificado activo.
-tls-status:
-	$(LOAD_ENV)
-	docker compose -f docker-compose.yml -p $(BASE_NAME) exec nginx \
-		openssl x509 -in /etc/letsencrypt/live/default/fullchain.pem -noout -issuer -subject -dates
 
 
 # psql.
@@ -269,7 +202,6 @@ docker-images-load:
 	docker image load < $(BASE_NAME)-postgres.tar.gz
 	docker image load < $(BASE_NAME)-martin.tar.gz
 	docker image load < $(BASE_NAME)-api.tar.gz
-	docker image load < $(BASE_NAME)-certbot.tar.gz
 
 
 # Montaje de volúmenes.
@@ -279,8 +211,6 @@ docker-volume-mount:
 		--entrypoint /bin/bash \
 		--workdir / \
 		-v $(BASE_NAME)-postgres-data:/volume-$(BASE_NAME)-postgres-data \
-		-v $(BASE_NAME)-letsencrypt-data:/volume-$(BASE_NAME)-letsencrypt-data \
-		-v $(BASE_NAME)-certbot-www:/volume-$(BASE_NAME)-certbot-www \
 		$(BASE_NAME)-api:latest
 
 
@@ -295,7 +225,7 @@ endif
 ifneq ($(HOSTNAME),$(PROD_HOSTNAME))
 
 
-.PHONY: build build-frontend build-api build-postgres images-save rsync-delete-dryrun rsync-delete
+.PHONY: build build-frontend build-api build-postgres docker-images-load docker-images-save docker-images-rm rsync-delete-dryrun rsync-delete
 
 
 # Mega build
@@ -364,7 +294,6 @@ docker-images-rm:
 	if [ "$$confirm" = "s" ]; then
 		docker image ls --filter reference=*$(BASE_NAME)* -q | xargs -r docker image rm
 		docker image rm ghcr.io/maplibre/martin:$(MARTIN_PRODUCTION_DOCKER_TAG)
-		docker image rm certbot/certbot:$(CERTBOT_PRODUCTION_DOCKER_TAG)
 	fi
 
 
@@ -374,7 +303,6 @@ docker-images-pull:
 	echo "$${GITHUB_TOKEN}" | docker login ghcr.io -u $${GITHUB_USERNAME} --password-stdin
 
 	docker pull ghcr.io/maplibre/martin:$(MARTIN_PRODUCTION_DOCKER_TAG)
-	docker pull certbot/certbot:$(CERTBOT_PRODUCTION_DOCKER_TAG)
 	docker pull python:$(PYTHON_API_PRODUCTION_DOCKER_TAG)
 	docker pull nginx:$(NGINX_PRODUCTION_DOCKER_TAG)
 	docker pull postgis/postgis:$(POSTGRES_PRODUCTION_DOCKER_TAG)
@@ -393,7 +321,6 @@ docker-images-save:
 	docker save $(BASE_NAME)-postgres:latest | gzip > $(BASE_NAME)-postgres.tar.gz
 	docker save ghcr.io/maplibre/martin:$(MARTIN_PRODUCTION_DOCKER_TAG) | gzip > $(BASE_NAME)-martin.tar.gz
 	docker save $(BASE_NAME)-api:latest | gzip > $(BASE_NAME)-api.tar.gz
-	docker save certbot/certbot:$(CERTBOT_PRODUCTION_DOCKER_TAG) | gzip > $(BASE_NAME)-certbot.tar.gz
 
 
 # rsync delete dry.

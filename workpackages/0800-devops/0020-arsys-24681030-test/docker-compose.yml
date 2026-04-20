@@ -1,16 +1,10 @@
 networks:
   network:
-    name: clima-gen
+    name: clima-gen-test
 
 volumes:
   postgres-data:
-    name: clima-gen-postgres-data
-    external: true
-  letsencrypt-data:
-    name: clima-gen-letsencrypt-data
-    external: true
-  certbot-www:
-    name: clima-gen-certbot-www
+    name: clima-gen-test-postgres-data
     external: true
 
 services:
@@ -20,19 +14,16 @@ services:
   #
   # -------------------
   nginx:
-    image: clima-gen-nginx:latest
-    container_name: clima-gen-nginx
+    image: clima-gen-test-nginx:latest
+    container_name: clima-gen-test-nginx
     restart: unless-stopped
 
     ports:
-      - "80:80"
-      - "443:443"
+      - "8080:80"
 
     volumes:
       - ./assets/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./assets/nginx/runtime-config.json:/app/runtime-config.json
-      - letsencrypt-data:/etc/letsencrypt
-      - certbot-www:/var/www/certbot
 
     networks:
       - network
@@ -55,8 +46,8 @@ services:
   #
   # -------------------
   api:
-    image: clima-gen-api:latest
-    container_name: clima-gen-api
+    image: clima-gen-test-api:latest
+    container_name: clima-gen-test-api
     env_file:
       - assets/env_files/postgresql.env
 
@@ -80,8 +71,8 @@ services:
   #
   # -------------------
   postgres:
-    image: clima-gen-postgres:latest
-    container_name: clima-gen-postgres
+    image: clima-gen-test-postgres:latest
+    container_name: clima-gen-test-postgres
     shm_size: "3GB"
     env_file:
       - assets/env_files/postgresql.env
@@ -107,7 +98,7 @@ services:
   # -------------------
   martin:
     image: ghcr.io/maplibre/martin:1.6.0
-    container_name: clima-gen-martin
+    container_name: clima-gen-test-martin
     restart: unless-stopped
     command: ["--config", "/config.yaml"]
     env_file:
@@ -133,34 +124,3 @@ services:
       timeout: 5s
       retries: 5
       start_period: 30s
-
-
-  # -------------------
-  #
-  # Certbot.
-  #
-  # -------------------
-  certbot:
-    image: certbot/certbot:v2.11.0
-    container_name: clima-gen-certbot
-    restart: unless-stopped
-
-    volumes:
-      - letsencrypt-data:/etc/letsencrypt
-      - certbot-www:/var/www/certbot
-
-    pid: "service:nginx"
-
-    entrypoint: /bin/sh
-    command: >
-      -c 'while :; do
-      certbot renew --webroot -w /var/www/certbot --quiet
-      --deploy-hook "kill -HUP 1";
-      sleep 1d;
-      done'
-
-    depends_on:
-      nginx:
-        condition: service_healthy
-      postgres:
-        condition: service_healthy
