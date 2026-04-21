@@ -5,74 +5,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Proyecto Clima-Gen</title>
-    <link rel="stylesheet" href="./src/lib/maplibre/maplibre-gl.css" />
-    <link rel="stylesheet" href="./src/styles.css" />
-    <script type="module" src="./src/lib/maplibre/maplibre-gl.js"></script>
+    <!-- <link rel="stylesheet" href="./src/styles.css" /> -->
 </head>
 
 <body>
-    <div id="splash-screen" class="splash-screen" role="dialog" aria-modal="true" aria-labelledby="splash-title">
-        <div class="splash-panel">
-            <h2 id="splash-title" class="splash-title">Bienvenido al visor de datos del proyecto Clima-Gen</h2>
-            <img id="splash-image" class="splash-image" src="src/assets/images/logo_clima_gen.webp" alt="Imagen de bienvenida al visor de datos del proyecto Clima-Gen" />
-            <div id="splash-content" class="splash-content"></div>
-            <button id="splash-close" class="splash-close" type="button">Acceder al mapa</button>
-        </div>
-    </div>
 
-    <div class="app-shell">
-        <main class="map-area">
+    <p><a href="src/pages/map.html" target="_blank">Ir al mapa</a></p>
 
-            <div id="map" aria-label="Map view"></div>
-
-            <div class="territory-selector-overlay">
-                <div class="selector-group">
-                    <label for="territory-select" class="territory-selector-label">Territorio</label>
-                    <select id="territory-select" class="territory-selector" aria-label="Nivel territorial">
-                        <option value="autonomia">Autonomías</option>
-                        <option value="provincia">Provincias</option>
-                        <option value="municipio">Municipios</option>
-                    </select>
-                </div>
-
-                <div class="selector-group">
-                    <label for="variable-select" class="territory-selector-label">Variable</label>
-                    <select id="variable-select" class="territory-selector" aria-label="Variable estadística"></select>
-                </div>
-            </div>
-
-            <div id="map-hover-info" class="map-hover-info" aria-live="polite">Move cursor over map</div>
-
-            <div id="map-legend" class="map-legend" aria-label="Autonomia legend"></div>
-
-            <aside id="variable-info-panel" class="variable-info-panel" aria-live="polite"></aside>
-
-            <div class="clima-gen-logo-overlay" aria-hidden="true">
-                <img id="clima-gen-logo" src="src/assets/images/logo_clima_gen.webp" alt="Logo Clima-Gen" />
-            </div>
-        </main>
-
-        <footer class="bar bar-footer">
-            <div class="footer-legal" aria-label="Legal notice">
-                <p class="footer-legal-title">Lorem Ipsum</p>
-                <p class="footer-legal-line">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-                <p class="footer-legal-line">Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</p>
-            </div>
-
-            <div class="footer-logos" aria-label="Partner logos">
-                <img class="footer-logo" id="logo_instituto_mujer" src="src/assets/images/logo_instituto_mujer.webp"
-                    alt="Logo Instituto de la Mujer" />
-                <img class="footer-logo" id="logo_upo" src="src/assets/images/logo_upo.webp"
-                    alt="Logo Universidad Pablo de Olavide" />
-                <img class="footer-logo" id="logo_universidad_barcelona"
-                    src="src/assets/images/logo_universidad_barcelona.webp" alt="Logo Universidad de Barcelona" />
-                <img id="logo_universidad_vigo" class="footer-logo" src="src/assets/images/logo_uvigo.webp"
-                    alt="Logo Universidad de Vigo" />
-            </div>
-        </footer>
-    </div>
-
-    <script type="module" src="./src/main.js"></script>
 </body>
 
 </html>

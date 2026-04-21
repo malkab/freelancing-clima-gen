@@ -1,0 +1,10 @@
+{
+  "martinBaseUrl": "http://localhost:8090/martin/",
+  "apiBaseUrl": "http://localhost:8090/api/v1/",
+  "selectedTerritory": "municipio",
+  "selectedVariable": "indice_clima_gen_sin_cambio_climatico",
+  "maxBounds": [ [-20, 27], [6, 44] ],
+  "center": [-6.75, 36],
+  "zoom": 4,
+  "boundGutter": 10.5
+}

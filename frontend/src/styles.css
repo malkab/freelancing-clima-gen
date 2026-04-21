@@ -109,7 +109,7 @@ body {
     flex-direction: column;
     gap: 2px;
     margin-right: auto;
-    visibility: hidden;
+    max-width: 500px;
 }
 
 .footer-legal-title,
@@ -124,7 +124,7 @@ body {
 }
 
 .footer-legal-line {
-    font-size: 0.72rem;
+    font-size: 0.85rem;
     line-height: 1.2;
 }
 
@@ -285,7 +285,7 @@ body {
 }
 
 #logo_universidad_vigo {
-    height: calc(var(--footer-logo-height) * 0.7);
+    height: calc(var(--footer-logo-height) * 0.5);
 }
 
 #logo_instituto_mujer {

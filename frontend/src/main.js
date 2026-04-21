@@ -4,7 +4,7 @@
  *
  */
 
-import maplibregl from "./lib/maplibre/maplibre-gl";
+import { Map, NavigationControl } from "maplibre-gl";
 import mapStyle from "./assets/map.json";
 import MapLibreHelpers from "./lib/maplibrehelpers.js";
 import LegendComponent from "./components/legendcomponent.js";
@@ -185,7 +185,7 @@ async function bootstrap() {
         );
 
     // Opciones de mapa.
-    gs.map = new maplibregl.Map({
+    gs.map = new Map({
         container: "map",
         center: runtimeConfig.center,
         zoom: runtimeConfig.zoom,
@@ -232,7 +232,7 @@ async function bootstrap() {
     gs.map.touchZoomRotate.disableRotation();
 
     // Añadimos controles de navegación.
-    gs.map.addControl(new maplibregl.NavigationControl(), "top-right");
+    gs.map.addControl(new NavigationControl(), "top-right");
 
     // Evento de mapa de movimiento de ratón, desencadena el
     // hover.

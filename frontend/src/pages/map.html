@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Proyecto Clima-Gen</title>
+    <link rel="stylesheet" href="../lib/maplibre/maplibre-gl.css" />
+    <link rel="stylesheet" href="../styles.css" />
+</head>
+
+<body>
+    <div id="splash-screen" class="splash-screen" role="dialog" aria-modal="true" aria-labelledby="splash-title">
+        <div class="splash-panel">
+            <h2 id="splash-title" class="splash-title">Bienvenido al visor de datos del proyecto Clima-Gen</h2>
+            <img id="splash-image" class="splash-image" src="../assets/images/logo_clima_gen.webp" alt="Imagen de bienvenida al visor de datos del proyecto Clima-Gen" />
+            <div id="splash-content" class="splash-content"></div>
+            <button id="splash-close" class="splash-close" type="button">Continuar</button>
+        </div>
+    </div>
+
+    <div class="app-shell">
+        <main class="map-area">
+
+            <div id="map" aria-label="Map view"></div>
+
+            <div class="territory-selector-overlay">
+                <div class="selector-group">
+                    <label for="territory-select" class="territory-selector-label">Territorio</label>
+                    <select id="territory-select" class="territory-selector" aria-label="Nivel territorial">
+                        <option value="autonomia">Autonomías</option>
+                        <option value="provincia">Provincias</option>
+                        <option value="municipio">Municipios</option>
+                    </select>
+                </div>
+
+                <div class="selector-group">
+                    <label for="variable-select" class="territory-selector-label">Variable</label>
+                    <select id="variable-select" class="territory-selector" aria-label="Variable estadística"></select>
+                </div>
+            </div>
+
+            <div id="map-hover-info" class="map-hover-info" aria-live="polite">Move cursor over map</div>
+
+            <div id="map-legend" class="map-legend" aria-label="Autonomia legend"></div>
+
+            <aside id="variable-info-panel" class="variable-info-panel" aria-live="polite"></aside>
+
+            <div class="clima-gen-logo-overlay" aria-hidden="true">
+                <img id="clima-gen-logo" src="../assets/images/logo_clima_gen.webp" alt="Logo Clima-Gen" />
+            </div>
+        </main>
+
+        <footer class="bar bar-footer">
+            <div class="footer-legal" aria-label="Legal notice">
+                <p class="footer-legal-line">Este sitio web forma parte del proyecto <b>ClimaGen: Evaluación del Impacto del Cambio Climático en la Desigualdad de Género en España</b>. El proyecto ha sido financiado por el Instituto de las Mujeres del Ministerio de Igualdad. 2024-2026.</p>
+            </div>
+
+            <div class="footer-logos" aria-label="Partner logos">
+                <a href="https://www.inmujeres.gob.es/" target="_blank"><img class="footer-logo" id="logo_instituto_mujer" src="../assets/images/logo_instituto_mujer.webp"
+                    alt="Logo Instituto de la Mujer" /></a>
+                <a href="https://www.upo.es/portal/impe/web/portada/index.html" target="_blank"><img class="footer-logo" id="logo_upo" src="../assets/images/logo_upo.webp"
+                    alt="Logo Universidad Pablo de Olavide" /></a>
+                <a href="https://web.ub.edu/es/" target="_blank"><img class="footer-logo" id="logo_universidad_barcelona"
+                    src="../assets/images/logo_universidad_barcelona.webp" alt="Logo Universidad de Barcelona" /></a>
+                <a href="https://www.uvigo.gal/es" target="_blank"><img id="logo_universidad_vigo" class="footer-logo" src="../assets/images/logo_uvigo.webp"
+                    alt="Logo Universidad de Vigo" /></a>
+                <a href="https://www.upo.es/catedra-macrosad/" target="_blank"><img id="logo_catedra_macrosad" class="footer-logo" src="../assets/images/logo_catedra_macrosad.webp"
+                    alt="Logo Cátedra Macrosad" /></a>
+            </div>
+        </footer>
+    </div>
+
+    <script type="module" src="../main.js"></script>
+</body>
+
+</html>
