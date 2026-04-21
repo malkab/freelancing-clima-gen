@@ -6,7 +6,7 @@
       <synchronize>true</synchronize>
       <remarks>Localhost devcontainer para climagen</remarks>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://localhost:5432/climagen</jdbc-url>
+      <jdbc-url>jdbc:postgresql://localhost:5732/climagen</jdbc-url>
       <vm-options>-Xmx8000m</vm-options>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
