@@ -5,17 +5,17 @@
  */
 
 import { Map, NavigationControl } from "maplibre-gl";
-import mapStyle from "./assets/map.json";
-import MapLibreHelpers from "./lib/maplibrehelpers.js";
-import LegendComponent from "./components/legendcomponent.js";
-import HoverComponent from "./components/hovercomponent.js";
-import RuntimeConfig from "./lib/runtimeconfig.js";
-import Martin from "./lib/martin.js";
-import Variable from "./lib/variable.js";
-import TerritorySelectorComponent from "./components/territoryselectorcomponent.js";
-import VariableSelectorComponent from "./components/variableselectorcomponent.js";
-import VariableInfoPanelComponent from "./components/variableinfopanelcomponent.js";
-import SplashScreenComponent from "./components/splashscreencomponent.js";
+import mapStyle from "../assets/map.json";
+import MapLibreHelpers from "./maplibrehelpers.js";
+import LegendComponent from "../components/legendcomponent.js";
+import HoverComponent from "../components/hovercomponent.js";
+import RuntimeConfig from "./runtimeconfig.js";
+import Martin from "./martin.js";
+import Variable from "./variable.js";
+import TerritorySelectorComponent from "../components/territoryselectorcomponent.js";
+import VariableSelectorComponent from "../components/variableselectorcomponent.js";
+import VariableInfoPanelComponent from "../components/variableinfopanelcomponent.js";
+import SplashScreenComponent from "../components/splashscreencomponent.js";
 
 
 /**
@@ -122,10 +122,7 @@ async function bootstrap() {
 
     // Inicialización de splash con mensaje HTML.
     splashScreenComponent.init();
-    splashScreenComponent.open(`
-        <p>Esta aplicación muestra las variables territoriales utilizadas en el estudio, así como sus resultadaos, sobre un mapa interactivo.</p>
-        <p>Seleccione en los desplegables el nivel de desagregación territorial y la variable que desee visualizar.</p>
-    `);
+    splashScreenComponent.open();
 
     // Inicializamos el selector territorial con el valor por
     // defecto.
@@ -192,7 +189,7 @@ async function bootstrap() {
         maxBounds: maxBounds,
         attributionControl: {
             compact: true,
-            customAttribution: "Proyecto Clima-Gen | MapLibre"
+            customAttribution: "Proyecto CLIMA-GEN | MapLibre"
         }
     });
 

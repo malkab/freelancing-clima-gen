@@ -55,11 +55,11 @@ export default class SplashScreenComponent {
             return;
         }
 
-        if (this.content && typeof messageHtml === "string") {
-            this.content.innerHTML = messageHtml;
-        }
+        // if (this.content && typeof messageHtml === "string") {
+        //     this.content.innerHTML = messageHtml;
+        // }
 
-        this.container.style.display = "flex";
+        // this.container.style.display = "flex";
         this.lockMapInteraction();
     }
 

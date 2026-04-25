@@ -4,30 +4,32 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Proyecto Clima-Gen</title>
+    <title>Proyecto CLIMA-GEN</title>
     <link rel="stylesheet" href="../lib/maplibre/maplibre-gl.css" />
-    <link rel="stylesheet" href="../styles.css" />
+    <link rel="stylesheet" href="../styles/common.css" />
+    <link rel="stylesheet" href="../styles/map.css" />
 </head>
 
 <body>
-    <div id="splash-screen" class="splash-screen" role="dialog" aria-modal="true" aria-labelledby="splash-title">
-        <div class="splash-panel">
-            <h2 id="splash-title" class="splash-title">Bienvenido al visor de datos del proyecto Clima-Gen</h2>
-            <img id="splash-image" class="splash-image" src="../assets/images/logo_clima_gen.webp" alt="Imagen de bienvenida al visor de datos del proyecto Clima-Gen" />
-            <div id="splash-content" class="splash-content"></div>
-            <button id="splash-close" class="splash-close" type="button">Continuar</button>
+    <div id="splash-screen" role="dialog" aria-modal="true" aria-labelledby="splash-title2">
+        <div id="splash-panel">
+            <img id="splash-image" class="splash-image" src="../assets/images/logo_clima_gen.webp" alt="Imagen de bienvenida al visor de datos del proyecto CLIMA-GEN" />
+            <h1>Bienvenido al visor de datos del proyecto CLIMA-GEN</h1>
+            <p>Esta aplicación muestra las variables territoriales utilizadas en el estudio, así como sus resultadaos, sobre un mapa interactivo.</p>
+            <p>Seleccione en los desplegables el nivel de desagregación territorial y la variable que desee visualizar.</p>
+            <button id="splash-close" type="button">Entrar</button>
         </div>
     </div>
 
-    <div class="app-shell">
-        <main class="map-area">
+    <div id="app-shell">
+        <main>
 
             <div id="map" aria-label="Map view"></div>
 
-            <div class="territory-selector-overlay">
+            <div id="territory-selector-overlay">
                 <div class="selector-group">
-                    <label for="territory-select" class="territory-selector-label">Territorio</label>
-                    <select id="territory-select" class="territory-selector" aria-label="Nivel territorial">
+                    <label for="territory-select" class="selector-label">Territorio</label>
+                    <select id="territory-select" class="selector" aria-label="Nivel territorial">
                         <option value="autonomia">Autonomías</option>
                         <option value="provincia">Provincias</option>
                         <option value="municipio">Municipios</option>
@@ -35,28 +37,30 @@
                 </div>
 
                 <div class="selector-group">
-                    <label for="variable-select" class="territory-selector-label">Variable</label>
-                    <select id="variable-select" class="territory-selector" aria-label="Variable estadística"></select>
+                    <label for="variable-select" class="selector-label">Variable</label>
+                    <select id="variable-select" class="selector" aria-label="Variable estadística"></select>
                 </div>
             </div>
 
             <div id="map-hover-info" class="map-hover-info" aria-live="polite">Move cursor over map</div>
 
-            <div id="map-legend" class="map-legend" aria-label="Autonomia legend"></div>
+            <div id="map-legend" aria-label="legend"></div>
 
             <aside id="variable-info-panel" class="variable-info-panel" aria-live="polite"></aside>
 
-            <div class="clima-gen-logo-overlay" aria-hidden="true">
-                <img id="clima-gen-logo" src="../assets/images/logo_clima_gen.webp" alt="Logo Clima-Gen" />
+            <div id="clima-gen-logo-overlay" aria-hidden="true">
+                <img src="../assets/images/logo_clima_gen.webp" alt="Logo CLIMA-GEN" />
             </div>
         </main>
 
-        <footer class="bar bar-footer">
-            <div class="footer-legal" aria-label="Legal notice">
-                <p class="footer-legal-line">Este sitio web forma parte del proyecto <b>ClimaGen: Evaluación del Impacto del Cambio Climático en la Desigualdad de Género en España</b>. El proyecto ha sido financiado por el Instituto de las Mujeres del Ministerio de Igualdad. 2024-2026.</p>
+        <footer>
+            <div id="footer-legal" aria-label="Legal notice">
+                <p>Este sitio web forma parte del proyecto <strong>ClimaGen: Evaluación del Impacto del Cambio Climático en la Desigualdad de Género en España</strong>.</p>
+
+                <p>El proyecto ha sido financiado por el Instituto de las Mujeres del Ministerio de Igualdad. 2024-2026.</p>
             </div>
 
-            <div class="footer-logos" aria-label="Partner logos">
+            <div id="footer-logos" aria-label="Partner logos">
                 <a href="https://www.inmujeres.gob.es/" target="_blank"><img class="footer-logo" id="logo_instituto_mujer" src="../assets/images/logo_instituto_mujer.webp"
                     alt="Logo Instituto de la Mujer" /></a>
                 <a href="https://www.upo.es/portal/impe/web/portada/index.html" target="_blank"><img class="footer-logo" id="logo_upo" src="../assets/images/logo_upo.webp"
@@ -71,7 +75,7 @@
         </footer>
     </div>
 
-    <script type="module" src="../main.js"></script>
+    <script type="module" src="../lib/map.js"></script>
 </body>
 
 </html>

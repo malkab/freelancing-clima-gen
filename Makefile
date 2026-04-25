@@ -23,11 +23,17 @@ TEST_ARGS ?=
 .PHONY:
 # Estos ficheros env se aplican en el orden dado y las variables en ellos se van
 # sobreescribiendo.
-ENV_FILES := ./docker/assets/env
+ENV_FILES := ./docker/assets/env_files/env.env ./docker/assets/env_files/deployment.env
 # Nombre base de los objetos devcontainer, para los targets que manipulan los
 # contenedores.
 BASE_NAME := freelancing-clima-gen
-PG_DUMP_FILE := 20260419_123422-climagen.pgdump
+PG_DUMP_FILE := climagen.pgdump
+
+# Versiones imágenes básicas.
+POSTGRES_DOCKER_TAG := 18-3.6
+MARTIN_DOCKER_TAG := 1.6.0
+NODE_DOCKER_TAG := trixie
+NGINX_DOCKER_TAG := 1.29.2-trixie
 
 
 # ----------------------------------
@@ -116,7 +122,7 @@ pg-psql:
 		-e PGUSER=$$PGUSER \
 		-e PGDATABASE=$$PGDATABASE \
 		-e PGPASSWORD=$$PGPASSWORD \
-		freelancing-clima-gen-postgres
+		$(BASE_NAME)-postgres
 
 
 # ¡MUCHO CUIDADO! Tira los volúmenes.
@@ -202,6 +208,22 @@ docker-compose-rm:
 	fi
 
 
+# Hace pull de las imágenes Docker base.
+docker-images-pull:
+	$(LOAD_ENV)
+	echo "$${GITHUB_TOKEN}" | docker login ghcr.io -u $${GITHUB_USERNAME} --password-stdin
+
+	scp ob:/home/obs/imagenes_docker/data_awkward_armadillo_9dca87.tar.gz .
+	docker image load < data_awkward_armadillo_9dca87.tar.gz
+
+	docker pull ghcr.io/maplibre/martin:$(MARTIN_DOCKER_TAG)
+	docker pull postgis/postgis:$(POSTGRES_DOCKER_TAG)
+	docker pull node:$(NODE_DOCKER_TAG)
+	docker pull nginx:$(NGINX_DOCKER_TAG)
+
+	rm ./data_awkward_armadillo_9dca87.tar.gz
+
+
 # Logs de la API Python.
 docker-logs-python:
 	$(LOAD_ENV)
@@ -227,13 +249,23 @@ docker-restart-martin:
 
 
 # Ejecución del servidor de desarrollo.
-docker-node-run-dev:
+docker-exec-node-run-dev:
 	$(LOAD_ENV)
 	docker exec -ti \
 		--workdir /workspace/frontend \
 		--user node \
 		$(BASE_NAME)-node \
 		npm run dev
+
+
+# Ejecución del servidor de desarrollo.
+docker-exec-node-run-build:
+	$(LOAD_ENV)
+	docker exec -ti \
+		--workdir /workspace/frontend \
+		--user node \
+		$(BASE_NAME)-node \
+		npm run build
 
 
 # Restauración de la base de datos.
@@ -271,13 +303,22 @@ pg-restore:
 
 
 # OpenCode.
-docker-exec-opencode:
+docker-exec-opencode-python:
 	$(LOAD_ENV)
 	docker exec -ti \
 		--workdir /workspace \
 		--user vscode \
 		$(BASE_NAME)-python \
 		/bin/bash -c "/home/vscode/.opencode/bin/opencode"
+
+
+docker-exec-opencode-node:
+	$(LOAD_ENV)
+	docker exec -ti \
+		--workdir /workspace \
+		--user node \
+		$(BASE_NAME)-node \
+		/bin/bash -c "/home/node/.opencode/bin/opencode"
 
 
 # Sirve el dist del frontend para depuración.
@@ -291,4 +332,4 @@ docker-nginx-serve-dist:
 		-v $(PWD)/frontend/dist:/app:ro \
 		-v $(PWD)/docker/assets/nginx/runtime-config.json:/app/runtime-config.json:ro \
 		-p 8090:80 \
-		nginx:1.29.2-trixie
+		nginx:$(NGINX_DOCKER_TAG)

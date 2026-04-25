@@ -1,0 +1,142 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500;700&family=Roboto:wght@300;500;700&display=swap");
+
+:root {
+    --color-main: #c4017a;
+    --color-alternate: #009de1;
+    --color-alternate-50: color-mix(in srgb, var(--color-alternate) 50%, transparent);
+    --color-shadow: #0000007e;
+    --background-white: #ffffff;
+    --font-color: #424242;
+    --font-color-secondary: #8d8d8d;
+    --footer-logo-height: 60px;
+    --footer-padding-y: 10px;
+    --footer-height: calc(var(--footer-logo-height) + (var(--footer-padding-y) * 2));
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    color: var(--font-color);
+    font-family: "Roboto", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: 300;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: "Montserrat", "Roboto", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: 300;
+    text-align: left;
+    color: var(--color-main);
+}
+
+.h-centered {
+    text-align: center;
+}
+
+div#app-shell {
+    height: 100dvh;
+    min-height: 100dvh;
+    display: grid;
+    grid-template-rows: 1fr var(--footer-height);
+}
+
+main {
+    position: relative;
+    overflow: hidden;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+
+    Footer.
+
+*/
+footer {
+    align-items: center;
+    display: flex;
+    gap: 20px;
+    justify-content: space-between;
+    padding: var(--footer-padding-y) 20px;
+    min-width: 0;
+}
+
+div#footer-legal {
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+div#footer-legal p {
+    font-size: 0.8rem;
+    margin: 0px;
+}
+
+div#footer-logos {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 30px;
+    row-gap: 10px;
+    margin-right: 0;
+    max-width: 100%;
+    min-width: 0;
+}
+
+.footer-logo {
+    height: var(--footer-logo-height);
+    display: block;
+}
+
+div#footer-logos #logo_universidad_vigo {
+    height: calc(var(--footer-logo-height) * 0.55);
+}
+
+div#footer-logos #logo_instituto_mujer {
+    height: calc(var(--footer-logo-height) * 0.7);
+}
+
+div#footer-logos #logo_upo {
+    height: calc(var(--footer-logo-height) * 0.8);
+}
+
+@media (max-width: 1500px) {
+    footer {
+        justify-content: center;
+    }
+
+    div#footer-logos {
+        justify-content: center;
+    }
+
+    div#footer-legal {
+        display: none;
+    }
+
+
+    div#footer-logos {
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
+/* END Footer. */

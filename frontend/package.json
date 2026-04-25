@@ -12,6 +12,8 @@
     "vite": "^8.0.1"
   },
   "dependencies": {
+    "dompurify": "^3.2.7",
+    "marked": "^15.0.12",
     "maplibre-gl": "^5.23.0"
   }
 }

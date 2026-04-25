@@ -20,8 +20,7 @@ services:
       dockerfile: Dockerfile-python
     image: freelancing-clima-gen-python
     container_name: freelancing-clima-gen-python
-    env_file:
-      - assets/env
+    env_file: assets/env_files/env.env
 
     ports:
       - "8000:8000"
@@ -59,10 +58,8 @@ services:
     volumes:
       - postgres-data-light:/var/lib/postgresql/
       - ..:/workspace
-      - ./assets/postgres/postgresql-light.conf:/etc/postgresql/postgresql.conf
+      - ./assets/postgres/postgresql.conf:/etc/postgresql/postgresql.conf
       - ./assets/postgres/db_setup.sql:/docker-entrypoint-initdb.d/db_setup.sql
-      # - postgres-data-heavy:/var/lib/postgresql/
-      #- ./assets/postgres/postgresql-heavy.conf:/etc/postgresql/postgresql.conf
 
     networks:
       - network
@@ -79,11 +76,11 @@ services:
   #
   # -------------------
   martin:
-    image: ghcr.io/maplibre/martin:v0.16.0
+    image: ghcr.io/maplibre/martin:1.6.0
     container_name: freelancing-clima-gen-martin
     restart: unless-stopped
     command: ["--config", "/config.yaml"]
-    env_file: ./assets/env
+    env_file: assets/env_files/env.env
 
     ports:
       - "3500:3000"
@@ -129,3 +126,5 @@ services:
 
     volumes:
       - ..:/workspace
+      - /home/malkab/opencode-data/config/:/home/node/.config/opencode/
+      - /home/malkab/opencode-data/auth/:/home/node/.local/share/opencode/

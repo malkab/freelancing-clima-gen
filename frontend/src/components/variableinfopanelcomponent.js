@@ -38,8 +38,8 @@ export default class VariableInfoPanelComponent {
             ?? "Sin descripcion corta disponible.";
 
         this.container.innerHTML = `
-            <h1>${title}</h1>
-            ${descriptionShort}
+            <h2>${title}</h2>
+            <div id="variable-description">${descriptionShort}</div>
         `;
 
         this.container.style.display = "block";

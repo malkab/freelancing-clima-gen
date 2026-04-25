@@ -261,7 +261,7 @@ pg-restore:
 
 
 # Carga las imágenes.
-docker-images-load:
+images-load:
 	$(LOAD_ENV)
 	cd ./images/
 
@@ -382,7 +382,7 @@ docker-images-pull:
 
 
 # Guardar las imágenes Docker.
-docker-images-save:
+images-save:
 	$(LOAD_ENV)
 	rm -Rf images
 	mkdir -p images

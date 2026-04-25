@@ -52,9 +52,9 @@ export default class LegendComponent {
             .join("");
 
         this.legendContainer.innerHTML = `
-        <p class="map-legend-title">${title}</p>
-        <div class="map-legend-bar" style="background: linear-gradient(to right, ${gradient});"></div>
-        <div class="map-legend-scale">${ticks}</div>
+        <h4>${title}</h4>
+        <div id="map-legend-bar" style="background: linear-gradient(to right, ${gradient});"></div>
+        <div id="map-legend-scale">${ticks}</div>
         `;
 
     }

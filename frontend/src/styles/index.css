@@ -1,0 +1,196 @@
+:root {
+    --left-nav-left: 24px;
+    --side-logo-width: 320px;
+    --main-content-width: 800px;
+    --main-content-right-gap: 5%;
+}
+
+main {
+    overflow: auto;
+}
+
+/*
+
+    Side panel - Navigation.
+
+*/
+
+aside#left-nav-panel {
+    position: fixed;
+    top: var(--left-nav-left);
+    left: var(--left-nav-left);
+    background: var(--background-white);
+    width: var(--side-logo-width);
+}
+
+img.logo-clima-gen {
+    width: var(--side-logo-width);
+}
+
+nav#left-nav-sections {
+    margin: 40px 0px;
+    padding: 0px 20px
+}
+
+a.go-to-map-link {
+    display: block;
+    padding: 9px 16px;
+    border-radius: 15px;
+    background: var(--color-main);
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    line-height: 1;
+    margin: 25px 20px;
+    text-align: center;
+}
+
+a.go-to-map-link:hover {
+    background: var(--color-alternate);
+}
+
+div.section-link {
+    margin-bottom: 10px;
+}
+
+div.section-link a {
+    text-decoration: none;
+    font-size: 0.95rem;
+    color: var(--font-color);
+}
+
+div.section-link a:hover {
+    color: var(--color-main);
+}
+
+/* END: Side panel - Navigation. */
+
+div#app-shell {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+
+div#main-content {
+    line-height: 1.75;
+    margin-left: calc(((100vw - var(--main-content-width)) / 2) + (var(--side-logo-width) / 2));
+    margin-right: calc(((100vw - var(--main-content-width)) / 2) - (var(--side-logo-width) / 2));
+    margin-top: 100px;
+    max-width: var(--main-content-width);
+    text-align: justify;
+}
+
+hr.section-divider {
+    border: none;
+    border-top: 1px solid var(--font-color-secondary);
+    margin: 50px 50px;
+}
+
+div#main-content img[src*="orcid.logo"] {
+    /* display: inline-block; */
+    /* width: 22px; */
+    height: 22px;
+    margin-left: 5px;
+    margin-right: 3px;
+    vertical-align: text-bottom;
+    display: inline;
+}
+
+div#main-legal {
+    display: none;
+    margin-left: calc(100vw - var(--main-content-width) - var(--main-content-right-gap));
+    max-width: var(--main-content-width);
+    text-align: justify;
+}
+
+div#small-header {
+    display: none;
+}
+
+@media (max-width: 1500px) {
+
+    div#main-legal {
+        display: block;
+        margin-left: calc(((100vw - var(--main-content-width)) / 2) + (var(--side-logo-width) / 2));
+        margin-right: calc(((100vw - var(--main-content-width)) / 2) - (var(--side-logo-width) / 2));
+    }
+
+}
+
+@media (max-width: 1280px) {
+
+    a.go-to-map-link {
+        width: var(--side-logo-width);
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 70px;
+        font-size: 1.2rem;
+    }
+
+    div#small-header {
+        display: block;
+        text-align: center;
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-top: 20px;
+    }
+
+    aside#left-nav-panel {
+        display: none;
+    }
+
+    div#main-content {
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 0px;
+        padding: 0px 40px;
+    }
+
+    div#main-legal {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        padding-left: 40px;
+        padding-right: 40px;
+        padding-top: 0px;
+        padding-bottom: 40px;
+    }
+
+}
+
+@media (max-width: 400px) {
+
+    div#small-header img {
+        width: 200px;
+    }
+
+    div#main-content h1 {
+        font-size: 1.2rem;
+    }
+
+    div#main-content h2 {
+        font-size: 1rem;
+    }
+
+    div#footer-logos #logo_instituto_mujer {
+        height: calc(var(--footer-logo-height) * 0.45);
+    }
+
+    div#footer-logos #logo_upo {
+        height: calc(var(--footer-logo-height) * 0.6);
+    }
+
+    div#footer-logos #logo_universidad_barcelona {
+        height: calc(var(--footer-logo-height) * 0.6);
+    }
+
+    div#footer-logos #logo_universidad_vigo {
+        height: calc(var(--footer-logo-height) * 0.35);
+    }
+
+    div#footer-logos #logo_catedra_macrosad {
+        height: calc(var(--footer-logo-height) * 0.8);
+    }
+
+}

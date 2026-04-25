@@ -18,4 +18,8 @@ RUN npm install -g vite create-vite@9.0.3
 
 USER node
 
+# Instalamos OpenCode.
+RUN mkdir -p /home/node/.local/share/opencode/
+RUN curl -fsSL https://opencode.ai/install | bash
+
 CMD ["sleep", "infinity"]

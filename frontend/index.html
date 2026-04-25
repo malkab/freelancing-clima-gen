@@ -4,13 +4,63 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Proyecto Clima-Gen</title>
-    <!-- <link rel="stylesheet" href="./src/styles.css" /> -->
+    <title>Proyecto CLIMA-GEN</title>
+    <link rel="stylesheet" href="./src/styles/common.css" />
+    <link rel="stylesheet" href="./src/styles/index.css" />
 </head>
 
 <body>
 
-    <p><a href="src/pages/map.html" target="_blank">Ir al mapa</a></p>
+    <div id="app-shell">
+        <main>
+
+            <aside id="left-nav-panel" aria-label="Navegación por secciones">
+                <img class="logo-clima-gen" src="src/assets/images/logo_clima_gen.webp" alt="Logo CLIMA-GEN" />
+
+                <nav id="left-nav-sections"></nav>
+
+                <a class="go-to-map-link" href="src/pages/map.html" target="_blank" rel="noopener noreferrer">Ir al mapa</a>
+            </aside>
+
+            <div id="small-header">
+                <img class="logo-clima-gen" src="src/assets/images/logo_clima_gen.webp" alt="Logo CLIMA-GEN" />
+            </div>
+
+            <div id="main-content" aria-live="polite"></div>
+
+            <div id="main-legal">
+                <hr class="section-divider" />
+
+                <p>Este sitio web forma parte del proyecto <strong>ClimaGen: Evaluación del Impacto del Cambio Climático en la Desigualdad de Género en España</strong>.</p>
+
+                <p>El proyecto ha sido financiado por el Instituto de las Mujeres del Ministerio de Igualdad. 2024-2026.</p>
+            </div>
+
+        </main>
+
+        <footer>
+            <div id="footer-legal" aria-label="Legal notice">
+                <p>Este sitio web forma parte del proyecto <strong>ClimaGen: Evaluación del Impacto del Cambio Climático en la Desigualdad de Género en España</strong>.</p>
+
+                <p>El proyecto ha sido financiado por el Instituto de las Mujeres del Ministerio de Igualdad. 2024-2026.</p>
+            </div>
+
+            <div id="footer-logos" aria-label="Partner logos">
+                <a href="https://www.inmujeres.gob.es/" target="_blank"><img class="footer-logo" id="logo_instituto_mujer" src="./src/assets/images/logo_instituto_mujer.webp"
+                    alt="Logo Instituto de la Mujer" /></a>
+                <a href="https://www.upo.es/portal/impe/web/portada/index.html" target="_blank"><img class="footer-logo" id="logo_upo" src="./src/assets/images/logo_upo.webp"
+                    alt="Logo Universidad Pablo de Olavide" /></a>
+                <a href="https://web.ub.edu/es/" target="_blank"><img class="footer-logo" id="logo_universidad_barcelona"
+                    src="./src/assets/images/logo_universidad_barcelona.webp" alt="Logo Universidad de Barcelona" /></a>
+                <a href="https://www.uvigo.gal/es" target="_blank"><img id="logo_universidad_vigo" class="footer-logo" src="./src/assets/images/logo_uvigo.webp"
+                    alt="Logo Universidad de Vigo" /></a>
+                <a href="https://www.upo.es/catedra-macrosad/" target="_blank"><img id="logo_catedra_macrosad" class="footer-logo" src="./src/assets/images/logo_catedra_macrosad.webp"
+                    alt="Logo Cátedra Macrosad" /></a>
+            </div>
+        </footer>
+    </div>
+
+    <script type="module" src="src/lib/index.js"></script>
 
 </body>
 
